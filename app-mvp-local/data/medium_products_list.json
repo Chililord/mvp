@@ -1,0 +1,97 @@
+[
+    {
+        "product_name": "Apple iPhone 15 Pro Max 256GB Black Titanium",
+        "product_description": "The latest flagship smartphone from Apple with A17 Pro chip and advanced camera system.",
+        "sku": "IPHONE15PM256BLKTI",
+        "target_market": "Consumer Electronics Retail"
+    },
+    {
+        "product_name": "Can of Diet Soda (355ml)",
+        "manufacturer": "SodaStream Inc."
+    },
+    {
+        "product_name": "Extra Large Box of Organic Blueberries",
+        "internal_category": "Produce",
+        "user_defined_tags": "Organic, Fruit, Wholesale, Bulk"
+    },
+    {
+        "product_name": "Pack of 12 AA Duracell Batteries"
+    },
+    {
+        "product_name": "Family Pack of Whole Wheat Pasta 500g",
+        "product_description": "Made from 100% whole grain durum wheat.",
+        "internal_category": "Dry Goods"
+    },
+    {
+        "product_name": "Large t-shirt for men, black color",
+        "manufacturer": "Generic Apparel Co.",
+        "target_market": "Men's Clothing"
+    },
+    {
+        "product_name": "Box of small white chocolates, 100g",
+        "product_description": "Creamy white chocolate truffles with a soft center.",
+        "sku": "WHTCHOC100G"
+    },
+    {
+        "product_name": "Small Tin of Roasted Italian Coffee Beans",
+        "product_description": "Medium roast, arabica beans.",
+        "user_defined_tags": "Coffee, Beans, Italian, Roasted"
+    },
+    {
+        "product_name": "Can of black beans (low sodium)",
+        "internal_category": "Canned Goods"
+    },
+    {
+        "product_name": "Big bag of cheddar popcorn, 15oz",
+        "manufacturer": "SnackAttack Brands",
+        "product_description": "Gluten-free, real cheddar cheese powder."
+    },
+    {
+        "product_name": "Stainless Steel Travel Mug, 16oz",
+        "manufacturer": "HydroFlask",
+        "product_description": "Double wall vacuum insulation keeps drinks hot for 6 hours."
+    },
+    {
+        "product_name": "Organic Almond Milk, Unsweetened 3-Pack (32oz each)",
+        "internal_category": "Dairy Alternatives",
+        "user_defined_tags": "Plant-based, Vegan, Healthy, Shelf-stable"
+    },
+    {
+        "product_name": "Pack of 5 Reusable Microfiber Cleaning Cloths"
+    },
+    {
+        "product_name": "Noise-Cancelling Over-Ear Bluetooth Headphones",
+        "product_description": "40 hour battery life, deep bass, quick charge feature.",
+        "internal_category": "Electronics Accessories"
+    },
+    {
+        "product_name": "24 Pack of Crystal Geyser Alpine Spring Water",
+        "manufacturer": "Crystal Geyser Water Company",
+        "target_market": "Grocery, Convenience"
+    },
+    {
+        "product_name": "Wireless Ergonomic Mouse, White",
+        "product_description": "Vertical design reduces wrist strain, 6 buttons, USB receiver included.",
+        "sku": "MOUSE-ERG-WHT-V2"
+    },
+    {
+        "product_name": "Bag of Organic Fair Trade Coffee Beans, Ethiopian Roast (12oz)",
+        "internal_category": "Coffee",
+        "user_defined_tags": "Fair Trade, Organic, Ethiopian, Whole Bean"
+    },
+    {
+        "product_name": "Small Cast Iron Skillet, 8-inch preseasoned",
+        "manufacturer": "Lodge Cast Iron"
+    },
+    {
+        "product_name": "Dog Food, Large Breed Chicken & Rice (30 lb bag)",
+        "product_description": "Formulated for adult large breed dogs, supports joint health.",
+        "sku": "DF-LC-R-30LB"
+    },
+    {
+        "product_name": "Ultra HD 4K Webcam with Microphone",
+        "product_description": "Streaming camera for PC/Mac with autofocus and privacy cover.",
+        "sku": "WEBCAM4K-PRO",
+        "target_market": "Work From Home, Streaming"
+    }
+]
