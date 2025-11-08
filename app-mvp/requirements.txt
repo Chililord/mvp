@@ -3,3 +3,4 @@ loguru
 pydantic
 uvicorn
 vllm
+hf_transfer
