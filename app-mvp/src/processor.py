@@ -1,7 +1,7 @@
 from pydantic import BaseModel, Field, ValidationError
 from typing import Optional, List, Dict, Any
 import asyncio
-from vllm import llm_engine, SamplingParams
+from vllm import LLM, SamplingParams
 from loguru import logger
 
 class ProductAttributes(BaseModel):
@@ -45,7 +45,7 @@ def build_user_prompt_key_value(item: EnrichRequestItem):
     return prompt_text
 
 
-async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]]:
+async def call_llm_api_async(item: EnrichRequestItem, llm_engine: LLM) -> Optional[Dict[str, Any]]:
     """
     Makes an API call using the official Ollama SDK for reliable structured output, 
     validates the output, and ensures the identifier is included.
@@ -102,9 +102,9 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
         return None # Return None for other API errors
 
 # you need to add the type hints (List, Dict, Any) and import them from the typing module.
-async def process_data_api_concurrently_async(data_list: list[EnrichRequestItem]) -> List[Dict[str, Any]]:
+async def process_data_api_concurrently_async(data_list: list[EnrichRequestItem], llm_engine: LLM) -> List[Dict[str, Any]]:
 
-    tasks = [call_llm_api_async(data) for data in data_list]
+    tasks = [call_llm_api_async(data, llm_engine) for data in data_list]
 
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
