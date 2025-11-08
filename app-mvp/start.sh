@@ -54,7 +54,7 @@ echo "FROM $GGUF_SOURCE_PATH" > "$MODEL_FILE"
 echo "Importing GGUF model into Ollama registry..."
 
 # Start the server temporarily in the background to run the 'create' command
-/bin/ollama serve > /var/log/ollama_import.log 2>&1 &
+/usr/local/bin/ollama serve > /var/log/ollama_import.log 2>&1 &
 wait_for_ollama
 
 # Import the model
@@ -71,4 +71,4 @@ echo "Starting Code Server in background..."
 code-server --bind-addr 0.0.0.0:8080 --auth none --disable-telemetry > /var/log/code-server.log 2>&1 &
 
 echo "Starting final Ollama server in foreground..."
-exec /bin/ollama serve
+exec /usr/local/bin/ollama serve
