@@ -1,8 +1,9 @@
 from pydantic import BaseModel, Field, ValidationError
-from typing import Optional, List, Dict, Any
+from typing import Optional, List, Dict, Any # <-- Ensure Dict and Any are imported
+import ollama
 import asyncio
-from vllm import LLM, SamplingParams
 from loguru import logger
+
 
 '''
 
@@ -17,8 +18,13 @@ curl -X POST "https://0dsh3n5qguhykz-8000.proxy.runpod.net/enrich_products" \
 
 '''
 
-
-
+# NOTE: The Phi-3 model prefers to be helpful and descriptive. 
+# When it can't find a brand name, its default behavior is to provide a helpful 
+# explanation (like "No specific brand mentioned, hence empty string returned as 
+# placeholder.") rather than strictly following your formatting rule of just returning 
+# the simple string 'empty'
+# something to note in case a bunch of data is not generated when expected for a column
+# like brand name. This is VERY important to note
 class ProductAttributes(BaseModel):
     # Rename 'sku' to 'identifier' or 'original_name' to be explicit
     identifier: str = Field(description="The unique identifier from the input (usually the product name or SKU).")
@@ -48,7 +54,10 @@ class EnrichRequestItem(BaseModel):
         }
 
 
-def build_user_prompt_key_value(item: EnrichRequestItem):
+# Build 'key: value' prompt format for the llm from pydantic input schema
+# This gives the llm entire row context
+# Greatly improves pydantic output schema results over just reading 'product_name'
+def build_prompt_key_value(item: EnrichRequestItem):
     prompt_text = "Analyze the following product data:\n"
     
     # Use item.dict(exclude_none=True) to dynamically include only provided fields
@@ -60,51 +69,51 @@ def build_user_prompt_key_value(item: EnrichRequestItem):
     return prompt_text
 
 
-async def call_llm_api_async(item: EnrichRequestItem, llm_engine: LLM) -> Optional[Dict[str, Any]]:
+async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]]:
     """
     Makes an API call using the official Ollama SDK for reliable structured output, 
     validates the output, and ensures the identifier is included.
     """
-    user_prompt = build_user_prompt_key_value(item)
-    unique_id = item.sku if item.sku else item.product_name
+    client = ollama.AsyncClient(host='http://localhost:11434')
+    prompt = build_prompt_key_value(item)
     content = "" # Initialize content variable for error logging
-
-    system_prompt = (
-        'You are a ultra-concise data formatting AI. Your ONLY task is to generate a '
-        'VALID and COMPLETE JSON object based on the user request and schema provided. '
-        'Respond with nothing else. No conversational filler or extra words. '
-        'The required JSON schema is provided below. '
-        f'Schema: {ProductAttributes.model_json_schema()}'
-    )
-    # This is a much cleaner approach... agreed
-    prompt_template = f"<|system|>{system_prompt}<|end|><|user|>{user_prompt}<|end|><|assistant|>"
+    unique_id = item.sku if item.sku else item.product_name
 
     try:
-        # vLLM generate is a SYNCHRONOUS call but it is extremely fast because it runs on the GPU.
-        # When used with asyncio.gather() (which you already do), it efficiently batches requests.
-        
-        # We pass a list of prompts (even if just one) to the engine
-        outputs = llm_engine.generate(
-            prompts=[prompt_template], 
-            sampling_params=SamplingParams(
-                            temperature=0, 
-                            max_tokens=100,
-                        )
+        response = await client.chat(
+            model='phi3',
+            messages=[
+                {'role': 'system', 'content': 'You are a ultra-concise data formatting AI. '
+                'Your ONLY task is to generate a '
+                'VALID and COMPLETE JSON object based on the user request and schema '
+                'provided. Respond with nothing else. '
+                'No conversational filler or extra words. '
+                'No extraneous details or explanations'
+                'Be direct and analytical. '
+                'Each json field must be less than 10 tokens.'},
+                {'role': 'user', 'content': prompt},
+            ],
+            options={
+                'temperature': 0,
+                'num_ctx': 500,
+                'num_predict': 100
+            },
+            format=ProductAttributes.model_json_schema(), 
         )
 
-        # Extract the generated text content
-        # There should only be one output as we passed one prompt
-        content = outputs[0].outputs[0].text.strip()
+        content = response['message']['content'].strip()
 
         # Validate the LLM output using Pydantic
         validated_product = ProductAttributes.model_validate_json(content)
 
-        # ... (rest of your validation logic is the same) ...
+        # Convert to dictionary immediately after validation
         validated_product_dict = validated_product.model_dump()
+
+        # Ensure the identifier field matches the Pydantic output schema field name
+        # We can trust this because Pydantic already validated that this field exists
         validated_product_dict['identifier'] = unique_id 
         
         return validated_product_dict
-
 
     except ValidationError as e:
         logger.error(f"Pydantic validation failed for item '{unique_id}'. Error: {e}")
@@ -112,14 +121,14 @@ async def call_llm_api_async(item: EnrichRequestItem, llm_engine: LLM) -> Option
         return None # Return None if validation fails
 
     except Exception as e:
-        logger.error(f"vLLM engine processing failed for item '{unique_id}'. Error: {e}")
+        logger.error(f"Ollama API call failed for item '{unique_id}'. Error: {e}")
         logger.error(f"Problematic content was: \n---\n{content}\n---\n")
         return None # Return None for other API errors
 
 # you need to add the type hints (List, Dict, Any) and import them from the typing module.
-async def process_data_api_concurrently_async(data_list: list[EnrichRequestItem], llm_engine: LLM) -> List[Dict[str, Any]]:
+async def process_data_api_concurrently_async(data_list: list[EnrichRequestItem]) -> List[Dict[str, Any]]:
 
-    tasks = [call_llm_api_async(data, llm_engine) for data in data_list]
+    tasks = [call_llm_api_async(data) for data in data_list]
 
     results = await asyncio.gather(*tasks, return_exceptions=True)
 
@@ -129,5 +138,5 @@ async def process_data_api_concurrently_async(data_list: list[EnrichRequestItem]
             results_dicts.append(result)
         elif isinstance(result, Exception):
              logger.info(f"An async task failed with error: {result}")
-
+            
     return results_dicts
