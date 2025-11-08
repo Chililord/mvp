@@ -12,7 +12,7 @@ async def lifespan(app: FastAPI):
     Initialize the vLLM engine when the app starts up.
     """
 
-    VLLM_MODEL_PATH = "/workspace/Phi-3-mini-4k-instruct"
+    VLLM_MODEL_PATH = "/workspace/phi3_quantized_model"
 
     logger.info(f"Loading vLLM model: {VLLM_MODEL_PATH}...")
     
