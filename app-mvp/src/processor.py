@@ -1,9 +1,8 @@
 from pydantic import BaseModel, Field, ValidationError
 from typing import Optional, List, Dict, Any
-import ollama
 import asyncio
+from vllm import llm_engine, SamplingParams
 from loguru import logger
-from src.main import llm_engine, VLLM_SAMPLING_PARAMS 
 
 class ProductAttributes(BaseModel):
     # Rename 'sku' to 'identifier' or 'original_name' to be explicit
@@ -72,7 +71,10 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
         # We pass a list of prompts (even if just one) to the engine
         outputs = llm_engine.generate(
             prompts=[prompt_template], 
-            sampling_params=VLLM_SAMPLING_PARAMS
+            sampling_params=SamplingParams(
+                            temperature=0, 
+                            max_tokens=100,
+                        )
         )
 
         # Extract the generated text content

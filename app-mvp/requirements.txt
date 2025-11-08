@@ -1,7 +1,5 @@
 fastapi
-gunicorn
 loguru
-ollama
 pydantic
 uvicorn
 vllm
