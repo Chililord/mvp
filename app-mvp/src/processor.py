@@ -4,6 +4,23 @@ import asyncio
 from vllm import LLM, SamplingParams
 from loguru import logger
 
+'''
+
+
+
+
+curl -X POST "https://rp74h11fuubrot-8000.proxy.runpod.net/" \
+     -H "Content-Type: application/json" \
+     --data @data/large_products_list.json
+
+
+
+
+
+'''
+
+
+
 class ProductAttributes(BaseModel):
     # Rename 'sku' to 'identifier' or 'original_name' to be explicit
     identifier: str = Field(description="The unique identifier from the input (usually the product name or SKU).")
