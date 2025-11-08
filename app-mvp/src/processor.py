@@ -6,16 +6,14 @@ from loguru import logger
 
 '''
 
+If you need to terminate for a new gpu, run these in order to sync with git repo:
+cp -r .ssh/* /root/.ssh/
+chmod 600 /root/.ssh/*
 
 
-
-curl -X POST "https://rp74h11fuubrot-8000.proxy.runpod.net/" \
+curl -X POST "https://0dsh3n5qguhykz-8000.proxy.runpod.net/enrich_products" \
      -H "Content-Type: application/json" \
-     --data @data/large_products_list.json
-
-
-
-
+     --data @app-mvp/data/large_products_list.json
 
 '''
 
