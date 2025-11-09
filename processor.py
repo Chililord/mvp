@@ -11,6 +11,8 @@ If you need to terminate for a new gpu, run these in order
 
 *expose port 8000 in the runpod*
 
+May need to reinstall in order to use the forced schema format parameter
+curl -fsSL https://ollama.com/install.sh | sh
 git config --global user.email "noahdouglasgarner@gmail.com"
 git config --global user.name Noah Garner
 cp -r .ssh/* /root/.ssh/
@@ -43,12 +45,21 @@ curl -X POST "https://heuzrxi4l1brf4-8000.proxy.runpod.net/enrich_products" \
 # the simple string 'empty'
 # something to note in case a bunch of data is not generated when expected for a column
 # like brand name. This is VERY important to note
+
+# INCREASES BOTH INPUT + OUTPUT, FED TO PROMPT + RETURNED TO USER
 class ProductAttributes(BaseModel):
     # Rename 'sku' to 'identifier' or 'original_name' to be explicit
     identifier: str = Field(description="The unique identifier from the input (usually the product name or SKU).")
     product_type: str = Field(description="The general category of the product.")
     brand: Optional[str] = Field(description="The brand name.")
-    size_quantity: str = Field(alias="size quantity", description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
+    size_quantity: Optional[str] = Field(alias="size quantity", description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
+    price: Optional[float] = Field(description="The numeric value of the product's price, or null if not available.")
+    currency: Optional[str] = Field(description="The three-letter ISO 4217 currency code (e.g., USD, EUR), or null if not available.")
+    availability: Optional[str] = Field(description="The product's availability status (e.g., in stock, out of stock, preorder), or null if not available.")
+    color: Optional[str] = Field(description="The primary color of the product, or null if not available.")
+    material: Optional[str] = Field(description="The main material used to make the product, or null if not available.")
+
+
 
 
 # Define the *Input* schema for the API endpoint (Standardized keys)
@@ -62,19 +73,8 @@ class EnrichRequestItem(BaseModel):
     # Used as join key later
     sku: Optional[str] = Field(None, description="[OPTIONAL] Your internal Stock Keeping Unit (SKU) or MPN.") 
 
-    # Add a Pydantic Config class to provide a better example to Swagger UI
-    class Config:
-        json_schema_extra = {
-            "example": {
-                "product_name": "Example product name only",
-                # The optional fields are simply omitted from this example
-            }
-        }
 
 
-# Build 'key: value' prompt format for the llm from pydantic input schema
-# This gives the llm entire row context
-# Greatly improves pydantic output schema results over just reading 'product_name'
 def build_prompt_key_value(item: EnrichRequestItem):
     prompt_text = "Analyze the following product data:\n"
     
@@ -107,22 +107,25 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
         'Your ONLY task is to generate a VALID and COMPLETE JSON object '
         'based on the user request and schema provided. Use only the exact keys from the schema. '
         'No conversational filler or extra words. '
-        '\n\n### JSON Schema to follow:\n' + product_schema_string # This concatenation is now valid
+        'The "price" field must be a raw number (float/integer format only), with no currency symbols, commas, or words like "USD".'
+        'Ensure "currency" field is a 3-letter code.'
+        '\n\n### JSON Schema to follow:\n'
+        f'{product_schema_string}'
     )
 
     try:
         response = await client.chat(
-            model='local-phi3-quantized', # FIX 2: Use the registered name
+            model='local-phi3-quantized',
             messages=[
                 {'role': 'system', 'content': system_prompt_content}, # Use the new prompt
                 {'role': 'user', 'content': prompt},
             ],
             options={
                 'temperature': 0,
-                'num_ctx': 500,
-                'num_predict': 100
+                'num_ctx': 1000,
+                'num_predict': 300
             },
-            format="json",
+            format='json', 
         )
         
         # FIX 4: Access content safely (adjust if SDK structure is different)
@@ -150,8 +153,9 @@ def chunk_list(data_list, batch_size):
 
 async def process_data_api_concurrently_async(all_items: List[EnrichRequestItem]):
     
-    # Use a BATCH_SIZE that you know won't crash (e.g., 10 or 12 items)
-    BATCH_SIZE = 20
+    # Use a BATCH_SIZE that you know won't crash (e.g., 20 items for A5000)
+    # THIS WILL CHANGE DEPENDING ON PYDANTIC SCHEMA OUTPUT LENGTH
+    BATCH_SIZE = 30
     all_results = []
     
     for batch in chunk_list(all_items, BATCH_SIZE):
@@ -159,9 +163,7 @@ async def process_data_api_concurrently_async(all_items: List[EnrichRequestItem]
         tasks = [call_llm_api_async(item) for item in batch]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
-        # ... (process results) ...
         all_results.extend(results)
         
-        # Memory will accumulate until all batches are done or system is idle for >1s
     
     return all_results
