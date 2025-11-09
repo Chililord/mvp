@@ -2053,7 +2053,7 @@ Datamiss: the prompts are cut off or your prompt/pydantic needs to be fixed
 
 
 Q:
-im on runpod cloud, is there a simpler way to do structured output with phi3 and objects? 
+I'm on runpod cloud, is there a simpler way to do structured output with phi3 and objects? 
 The original point was to enrich a user's data where they input product_name, 
 product_description, sku, and outputs product_type, brand, size_quantity etc. 
 What should i do next?

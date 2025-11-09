@@ -1,5 +1,8 @@
-Where we left off:
+Well, the engine is built. It needs a LOT of refinement, next steps are crucial
 
-The new fields greatly slowed processing time. This is expected, how much do we want for MVP?
+Do we refine further, do we get feedback, do we improve data quality?
 
-Fuck yeah
+The file I uploaded is a worst case scenario file with tons of missing data, there's that
+
+I still think adding a text field for 1 json input would be cool for users,
+implement that then get feedback

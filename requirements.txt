@@ -1,6 +1,15 @@
+dash-ag-grid
+dash-bootstrap-components
+dash_html_components
+dash-extensions
+dash-uploader
+python-multipart
+requests
 python-dotenv
 fastapi
 uvicorn
 pydantic
 ollama
 loguru
+pandas
+numpy

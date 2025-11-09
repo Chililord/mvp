@@ -5,33 +5,37 @@ import asyncio
 from loguru import logger
 import os
 '''
-
-If you need to terminate for a new gpu, run these in order
-
-1. expose port 8000 in the runpod asap
+expose port 8000 for fastapi and 8050 for dash
  
-2. cd mvp/
+Go to the project
+cd mvp/
 
-3. ./start.sh
+Build stuff
+./start.sh
 
 Run ollama:
 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 
 Run fastapi local/runpod:
-1. cd mvp/
-2a. uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
-2b. APP_ENV=local python -m uvicorn main:app --host 0.0.0.0 --port 8000
-RUNPOD
+cd mvp/
+uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload --env-file .env
+APP_ENV=local python -m uvicorn maini:app --host 0.0.0.0 --port 8000
 
+Run dash and visit https://yfswgjk96za5e4-8050.proxy.runpod.net/dash/
+cd mvp/
+PYTHONDONTWRITEBYTECODE=1 python -m app_dash
+
+
+curl data
+runpod
 curl -X POST "https:/yfswgjk96za5e4-8000.proxy.runpod.net/enrich_products" \
      -H "Content-Type: application/json" \
-     --data @data/large_products_list.json
+     --data @data/medium_products_list.json
 
-LOCAL
-     
+local
 curl -X POST "http://localhost:8000/docs/enrich_products" \
      -H "Content-Type: application/json" \
-     --data @data/large_products_list.json
+     --data @data/medium_products_list.json
 
 '''
 
