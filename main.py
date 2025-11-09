@@ -1,6 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from typing import List
-from src.processor import EnrichRequestItem, process_data_api_concurrently_async
+from processor import EnrichRequestItem, process_data_api_concurrently_async
 
 
 app = FastAPI(

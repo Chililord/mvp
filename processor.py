@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field, ValidationError
-from typing import Optional, List, Dict, Any # <-- Ensure Dict and Any are imported
+from typing import Optional, List, Dict, Any
 import ollama
 import asyncio
 from loguru import logger
@@ -8,11 +8,28 @@ from loguru import logger
 '''
 
 If you need to terminate for a new gpu, run these in order to sync with git repo:
+
+git config --global user.email "noahdouglasgarner@gmail.com"
+git config --global user.name Noah Garner
 cp -r .ssh/* /root/.ssh/
 chmod 600 /root/.ssh/*
+deactivate
+apt-get update
+apt-get install -y --reinstall python3-pip python3-venv python3-setuptools
+pip install -r requirements.txt
+expose port 8000 in the runpod
 
 
-curl -X POST "https://0dsh3n5qguhykz-8000.proxy.runpod.net/enrich_products" \
+Run ollama with:
+pkill ollama
+OLLAMA_NUM_PARALLEL=8 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
+
+Run fastapi with (change port per machine):
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
+
+
+# Curl the data to the llm, make sure to update host name and update port to match uvicorn's fastapi
+curl -X POST "https://h03j78mprz9sxw-8000.proxy.runpod.net/enrich_products" \
      -H "Content-Type: application/json" \
      --data @app-mvp/data/large_products_list.json
 
