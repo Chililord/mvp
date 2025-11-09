@@ -14,6 +14,6 @@ chmod 600 /root/.ssh/*
 
 python -m ensurepip --upgrade
 
-pip install -r /workspace/mvp/requirements.txt
+pip install -r requirements.txt
 
 echo "--- Configuration complete ---"

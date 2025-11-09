@@ -57,10 +57,10 @@
         "identifier": "MILK-OG-GAL",
         "product_type": "Dairy",
         "brand": null,
-        "size_quantity": "1 gallon jug",
-        "price": null,
-        "currency": null,
-        "availability": null
+        "size_quantity": "1 gallon",
+        "price": 3.99,
+        "currency": "USD",
+        "availability": "in stock"
     },
     {
         "identifier": "Reusable Silicone Food Storage Bags, Medium Size (2 pack)",
@@ -235,7 +235,7 @@
     },
     {
         "identifier": "Small Tin of Roasted Italian Coffee Beans",
-        "product_type": "coffee",
+        "product_type": "coffee beans",
         "brand": null,
         "size_quantity": "1 tin",
         "price": null,

@@ -8,24 +8,24 @@ import os
 
 If you need to terminate for a new gpu, run these in order
 
-*expose port 8000 in the runpod*
+1. expose port 8000 in the runpod asap
+ 
+2. cd mvp/
 
-run "./start.sh"
+3. ./start.sh
 
-Run ollama with:
+Run ollama:
 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 
-Run fastapi with (change port per machine):
-uvicorn mvp.main:app --host 0.0.0.0 --port 8000 --reload --env-file /workspace/mvp/.env
-
-
-# Curl the data to the llm, make sure to update host name and update port to match uvicorn's fastapi
-
+Run fastapi local/runpod:
+1. cd mvp/
+2a. uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
+2b. APP_ENV=local python -m uvicorn main:app --host 0.0.0.0 --port 8000
 RUNPOD
 
 curl -X POST "https:/yfswgjk96za5e4-8000.proxy.runpod.net/enrich_products" \
      -H "Content-Type: application/json" \
-     --data @mvp/data/large_products_list.json
+     --data @data/large_products_list.json
 
 LOCAL
      
