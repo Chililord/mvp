@@ -22,16 +22,16 @@ pip install -r requirements.txt
 
 Run ollama with:
 pkill ollama
-OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=16 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
+OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=24 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 
 Run fastapi with (change port per machine):
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
 
 
 # Curl the data to the llm, make sure to update host name and update port to match uvicorn's fastapi
-curl -X POST "https://h03j78mprz9sxw-8000.proxy.runpod.net/enrich_products" \
+curl -X POST "https://zfvzra5n6ryvu0-8000.proxy.runpod.net/enrich_products" \
      -H "Content-Type: application/json" \
-     --data @data/large_products_list.json
+     --data @data/medium_products_list.json
 
 '''
 
@@ -111,7 +111,7 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
 
     try:
         response = await client.chat(
-            model='phi3', # FIX 2: Use the registered name
+            model='local-phi3-quantized', # FIX 2: Use the registered name
             messages=[
                 {'role': 'system', 'content': system_prompt_content}, # Use the new prompt
                 {'role': 'user', 'content': prompt},
