@@ -10,31 +10,24 @@ If you need to terminate for a new gpu, run these in order
 
 *expose port 8000 in the runpod*
 
-May need to reinstall in order to use the forced schema format parameter
-curl -fsSL https://ollama.com/install.sh | sh
-git config --global user.email "noahdouglasgarner@gmail.com"
-git config --global user.name Noah Garner
-cp -r .ssh/* /root/.ssh/
-chmod 600 /root/.ssh/*
-deactivate
-cd mvp/
-pip install -r requirements.txt
-
-(Only need to run chmod 755 start.sh && ./start.sh if you build a new workspace)
+run "./start.sh"
 
 Run ollama with:
-pkill ollama
 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 
 Run fastapi with (change port per machine):
-uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
+uvicorn mvp.main:app --host 0.0.0.0 --port 8000 --reload --env-file /workspace/mvp/.env
 
 
 # Curl the data to the llm, make sure to update host name and update port to match uvicorn's fastapi
-curl -X POST "https://heuzrxi4l1brf4-8000.proxy.runpod.net/enrich_products" \
-     -H "Content-Type: application/json" \
-     --data @data/large_products_list.json
 
+RUNPOD
+
+curl -X POST "https:/yfswgjk96za5e4-8000.proxy.runpod.net/enrich_products" \
+     -H "Content-Type: application/json" \
+     --data @mvp/data/large_products_list.json
+
+LOCAL
      
 curl -X POST "http://localhost:8000/docs/enrich_products" \
      -H "Content-Type: application/json" \
@@ -105,7 +98,7 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
         'The "price" field must be a raw number (float/integer format only), with no currency symbols, commas, or words like "USD".'
         'Ensure "currency" field is a 3-letter code.'
         '\n\n### JSON Schema to follow:\n'
-        # f'{json.dump(ProductAttributes.model_json_schema(), indent=2)}'
+        f'{ProductAttributes.model_json_schema()}'
     )
 
     try:

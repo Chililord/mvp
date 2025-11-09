@@ -1,0 +1,5 @@
+Where we left off:
+
+The new fields greatly slowed processing time. This is expected, how much do we want for MVP?
+
+Fuck yeah
