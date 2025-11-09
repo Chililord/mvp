@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y git curl openssh-client \
 
 # Convenience for developer, the actual expose is done through runpod template UI
 # ollama, fastapi, code server
-EXPOSE 11434, 8000, 7777
+EXPOSE 11434 8000 7777
 
 RUN curl -fsSL https://ollama.com/install.sh | sh
 

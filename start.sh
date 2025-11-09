@@ -15,7 +15,6 @@ cp -r .ssh/* /root/.ssh/
 chmod 600 /root/.ssh/*
 echo "--- Configuration complete ---"
 
-# 3. Keep the container running in an interactive bash session
 echo "Starting interactive session. The container will remain active."
-# Use 'exec' to replace the current script process with bash
+# Keep container running: use 'exec' to replace the current script process with bash
 exec /bin/bash
