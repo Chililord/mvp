@@ -34,11 +34,3 @@ echo "Model import complete and saved to disk."
 
 # Kill the temporary server process
 pkill ollama
-sleep 2 # Give it a moment to shut down cleanly
-
-# --- 5. Start Services ---
-# ... (Code server startup) ...
-
-echo "Starting final Ollama server in foreground..."
-# Start final server. It now knows about 'local-phi3-quantized' from the database.
-exec /usr/local/bin/ollama serve

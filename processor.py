@@ -11,8 +11,7 @@ If you need to terminate for a new gpu, run these in order
 
 *expose port 8000 in the runpod*
 
-May need to reinstall in order to use the forced schema format parameter
-curl -fsSL https://ollama.com/install.sh | sh
+
 git config --global user.email "noahdouglasgarner@gmail.com"
 git config --global user.name Noah Garner
 cp -r .ssh/* /root/.ssh/
@@ -56,8 +55,6 @@ class ProductAttributes(BaseModel):
     price: Optional[float] = Field(description="The numeric value of the product's price, or null if not available.")
     currency: Optional[str] = Field(description="The three-letter ISO 4217 currency code (e.g., USD, EUR), or null if not available.")
     availability: Optional[str] = Field(description="The product's availability status (e.g., in stock, out of stock, preorder), or null if not available.")
-    color: Optional[str] = Field(description="The primary color of the product, or null if not available.")
-    material: Optional[str] = Field(description="The main material used to make the product, or null if not available.")
 
 
 
