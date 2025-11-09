@@ -1,10 +1,9 @@
-from pydantic import BaseModel, Field, ValidationError
+from pydantic import BaseModel, Field
 from typing import Optional, List, Dict, Any
 import ollama
 import asyncio
 from loguru import logger
-import json
-
+import os
 '''
 
 If you need to terminate for a new gpu, run these in order
@@ -33,6 +32,11 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
 
 # Curl the data to the llm, make sure to update host name and update port to match uvicorn's fastapi
 curl -X POST "https://heuzrxi4l1brf4-8000.proxy.runpod.net/enrich_products" \
+     -H "Content-Type: application/json" \
+     --data @data/large_products_list.json
+
+     
+curl -X POST "http://localhost:8000/docs/enrich_products" \
      -H "Content-Type: application/json" \
      --data @data/large_products_list.json
 
@@ -101,12 +105,18 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
         'The "price" field must be a raw number (float/integer format only), with no currency symbols, commas, or words like "USD".'
         'Ensure "currency" field is a 3-letter code.'
         '\n\n### JSON Schema to follow:\n'
-        f'{json.dump(ProductAttributes.model_json_schema(), indent=2)}'
+        # f'{json.dump(ProductAttributes.model_json_schema(), indent=2)}'
     )
 
     try:
+
+        if 'APP_ENV' in os.environ and os.environ['APP_ENV'] == 'local':
+            MODEL = "phi3"
+        else:
+            MODEL = "local-phi3-quantized"
+
         response = await client.chat(
-            model='local-phi3-quantized',
+            model=MODEL,
             messages=[
                 {'role': 'system', 'content': system_prompt_content}, # Use the new prompt
                 {'role': 'user', 'content': prompt},

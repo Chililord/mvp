@@ -1,22 +1,353 @@
 [
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null,
-    null
+    {
+        "identifier": "CUTBOARD-MPL-L",
+        "product_type": "cutting board",
+        "brand": "KitchenCraft",
+        "size_quantity": "one",
+        "price": null,
+        "currency": null,
+        "availability": "in stock"
+    },
+    {
+        "identifier": "Digital Bathroom Scale, Tempered Glass",
+        "product_type": "Health and Fitness Equipment",
+        "brand": "FitTrack",
+        "size_quantity": null,
+        "price": 79.99,
+        "currency": "USD",
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Set of 4 Linen Dinner Napkins, Gray",
+        "product_type": "Napkin",
+        "brand": "",
+        "size_quantity": null,
+        "price": null,
+        "currency": "",
+        "availability": null
+    },
+    {
+        "identifier": "HDMI Cable 4K 60Hz, 6 Feet Long",
+        "product_type": "Electronics",
+        "brand": "Skylink",
+        "size_quantity": "6 Feet Long",
+        "price": 5.0,
+        "currency": "USD",
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Box of Assorted Green Tea Bags (20 count)",
+        "product_type": "Beverage Packaging",
+        "brand": "Herbal Harmony",
+        "size_quantity": "20 count",
+        "price": 4.95,
+        "currency": "USD",
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Wireless Mechanical Keyboard, RGB Backlit, Brown Switches",
+        "product_type": "Keyboard",
+        "brand": "Razer",
+        "size_quantity": null,
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "MILK-OG-GAL",
+        "product_type": "Dairy Products",
+        "brand": null,
+        "size_quantity": "1 Gallon",
+        "price": 3.99,
+        "currency": "USD",
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Reusable Silicone Food Storage Bags, Medium Size (2 pack)",
+        "product_type": "Storage Bag",
+        "brand": null,
+        "size_quantity": "2 pack",
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "External Solid State Drive (SSD), 1TB, USB-C",
+        "product_type": "storage device",
+        "brand": "samsung",
+        "size_quantity": "1 terabyte",
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "DRYERBALL-WOOL-6PK",
+        "product_type": "Dryer Balls",
+        "brand": "EcoClean",
+        "size_quantity": "6",
+        "price": null,
+        "currency": null,
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Solar Powered Outdoor Security Light with Motion Sensor",
+        "product_type": "Security lighting system",
+        "brand": "EcoLight Solutions",
+        "size_quantity": "1 unit",
+        "price": 49.95,
+        "currency": "USD",
+        "availability": "In stock"
+    },
+    {
+        "identifier": "Book: 'The Hitchhiker's Guide to the Galaxy' by Douglas Adams",
+        "product_type": "book",
+        "brand": null,
+        "size_quantity": null,
+        "price": 9.99,
+        "currency": "USD",
+        "availability": "in stock"
+    },
+    {
+        "identifier": "Apple Watch Series 9 GPS + Cellular, Midnight Aluminum Case",
+        "product_type": "electronic device",
+        "brand": "Apple",
+        "size_quantity": null,
+        "price": 799.0,
+        "currency": "USD",
+        "availability": null
+    },
+    {
+        "identifier": "Organic Balsamic Vinegar of Modena, 500ml Bottle",
+        "product_type": "Beverage",
+        "brand": "De Nigris",
+        "size_quantity": ">500ml bottle",
+        "price": null,
+        "currency": null,
+        "availability": "In stock - limited quantity due to organic certification requirements."
+    },
+    {
+        "identifier": "Pack of 10 Micro USB Charging Cables (3ft length)",
+        "product_type": "Cable Set",
+        "brand": null,
+        "size_quantity": null,
+        "price": 5.99,
+        "currency": "USD",
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Travel Pillow, Memory Foam Neck Support",
+        "product_type": "Pillow",
+        "brand": null,
+        "size_quantity": null,
+        "price": 25.99,
+        "currency": "USD",
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Reusable K-Cup Coffee Filter, BPA-Free Plastic",
+        "product_type": "Filter",
+        "brand": "EcoBrew",
+        "size_quantity": ">50 units in stock",
+        "price": 4.99,
+        "currency": "USD",
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Wireless Noise Cancelling Earbuds, White",
+        "product_type": "audio accessory",
+        "brand": null,
+        "size_quantity": null,
+        "price": 149.99,
+        "currency": "USD",
+        "availability": "in stock"
+    },
+    {
+        "identifier": "Non-Stick 12 Cup Muffin Pan, Steel",
+        "product_type": "Bakeware",
+        "brand": null,
+        "size_quantity": null,
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "IPHONE15PM256BLKTI",
+        "product_type": "Smartphone",
+        "brand": "Apple",
+        "size_quantity": null,
+        "price": 1500.0,
+        "currency": "USD",
+        "availability": null
+    },
+    {
+        "identifier": "Can of Diet Soda (355ml)",
+        "product_type": "beverage",
+        "brand": "Diet Soda",
+        "size_quantity": null,
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "Extra Large Box of Organic Blueberries",
+        "product_type": "Food",
+        "brand": "",
+        "size_quantity": "Extra Large Box",
+        "price": null,
+        "currency": "",
+        "availability": null
+    },
+    {
+        "identifier": "Pack of 12 AA Duracell Batteries",
+        "product_type": "Battery Pack",
+        "brand": "Duracell",
+        "size_quantity": "12",
+        "price": 3.99,
+        "currency": "USD",
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Family Pack of Whole Wheat Pasta 500g",
+        "product_type": "Whole Grain Durum Wheat Pastas",
+        "brand": null,
+        "size_quantity": "500g",
+        "price": 2.99,
+        "currency": "USD",
+        "availability": "In Stock"
+    },
+    {
+        "identifier": "Large t-shirt for men, black color",
+        "product_type": "t-shirt",
+        "brand": "Generic Apparel Co.",
+        "size_quantity": "large",
+        "price": null,
+        "currency": "",
+        "availability": null
+    },
+    {
+        "identifier": "WHTCHOC100G",
+        "product_type": "confectionery",
+        "brand": null,
+        "size_quantity": "box containing approximately one hundred grams worth of product",
+        "price": 2.95,
+        "currency": "USD",
+        "availability": "in stock"
+    },
+    {
+        "identifier": "Small Tin of Roasted Italian Coffee Beans",
+        "product_type": "food",
+        "brand": "",
+        "size_quantity": null,
+        "price": null,
+        "currency": "",
+        "availability": null
+    },
+    {
+        "identifier": "Can of black beans (low sodium)",
+        "product_type": "canned goods",
+        "brand": "Healthy Harvest",
+        "size_quantity": "400g",
+        "price": 0.95,
+        "currency": "USD",
+        "availability": "in stock"
+    },
+    {
+        "identifier": "Big bag of cheddar popcorn, 15oz",
+        "product_type": "snack foods",
+        "brand": "SnackAttack Brands",
+        "size_quantity": null,
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "Stainless Steel Travel Mug, 16oz",
+        "product_type": "Travel Accessory",
+        "brand": "HydroFlask",
+        "size_quantity": null,
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "Organic Almond Milk, Unsweetened 3-Pack (32oz each)",
+        "product_type": "Beverage",
+        "brand": null,
+        "size_quantity": "32oz each",
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "Pack of 5 Reusable Microfiber Cleaning Cloths",
+        "product_type": "cleaning cloth",
+        "brand": null,
+        "size_quantity": "5 pieces",
+        "price": 29.97,
+        "currency": "USD",
+        "availability": "in stock"
+    },
+    {
+        "identifier": "Noise-Cancelling Over-Ear Bluetooth Headphones",
+        "product_type": "headphone",
+        "brand": null,
+        "size_quantity": null,
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "24 Pack of Crystal Geyser Alpine Spring Water",
+        "product_type": "Beverage",
+        "brand": "Crystal Geyser Water Company",
+        "size_quantity": null,
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "MOUSE-ERG-WHT-V2",
+        "product_type": "Mouse",
+        "brand": "",
+        "size_quantity": null,
+        "price": null,
+        "currency": "",
+        "availability": null
+    },
+    {
+        "identifier": "Bag of Organic Fair Trade Coffee Beans, Ethiopian Roast (12oz)",
+        "product_type": "Coffee",
+        "brand": "",
+        "size_quantity": null,
+        "price": null,
+        "currency": "",
+        "availability": null
+    },
+    {
+        "identifier": "Small Cast Iron Skillet, 8-inch preseasoned",
+        "product_type": "Cookware",
+        "brand": "Lodge Cast Iron",
+        "size_quantity": "8-inch",
+        "price": 15.99,
+        "currency": "USD",
+        "availability": "InStock"
+    },
+    {
+        "identifier": "DF-LC-R-30LB",
+        "product_type": "dog food",
+        "brand": null,
+        "size_quantity": "30 lbs",
+        "price": null,
+        "currency": null,
+        "availability": null
+    },
+    {
+        "identifier": "WEBCAM4K-PRO",
+        "product_type": "Webcam",
+        "brand": null,
+        "size_quantity": null,
+        "price": null,
+        "currency": null,
+        "availability": null
+    }
 ]
