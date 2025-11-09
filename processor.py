@@ -11,7 +11,8 @@ If you need to terminate for a new gpu, run these in order
 
 *expose port 8000 in the runpod*
 
-
+May need to reinstall in order to use the forced schema format parameter
+curl -fsSL https://ollama.com/install.sh | sh
 git config --global user.email "noahdouglasgarner@gmail.com"
 git config --global user.name Noah Garner
 cp -r .ssh/* /root/.ssh/
@@ -91,13 +92,6 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
     content = ""
     unique_id = item.sku if item.sku else item.product_name
 
-    # 1. Generate the JSON Schema string
-    product_schema_dict = ProductAttributes.model_json_schema()
-
-    # Convert the dictionary to a formatted string representation
-    product_schema_string = json.dumps(product_schema_dict, indent=2)
-
-
     # 2. Embed the schema into your System Prompt
     system_prompt_content = (
         'You are a ultra-concise data formatting AI. '
@@ -107,7 +101,7 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
         'The "price" field must be a raw number (float/integer format only), with no currency symbols, commas, or words like "USD".'
         'Ensure "currency" field is a 3-letter code.'
         '\n\n### JSON Schema to follow:\n'
-        f'{product_schema_string}'
+        f'{json.dump(ProductAttributes.model_json_schema(), indent=2)}'
     )
 
     try:
@@ -122,7 +116,7 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
                 'num_ctx': 1000,
                 'num_predict': 300
             },
-            format='json', 
+            format=ProductAttributes.model_json_schema(), 
         )
         
         # FIX 4: Access content safely (adjust if SDK structure is different)
