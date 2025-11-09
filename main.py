@@ -8,9 +8,10 @@ app = FastAPI(
     description="An API service to enrich raw product data using a local LLM accelerator."
 )
 
-@app.post("/enrich_products_master", summary="Enrich a list of product items")
+@app.post("/enrich_products", summary="Enrich a list of product items")
 async def enrich_products_endpoint(items: List[EnrichRequestItem]):
     if not items:
         raise HTTPException(status_code=400, detail="Input list cannot be empty.")
 
     return await process_data_api_concurrently_async(items)
+

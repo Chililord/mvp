@@ -3,7 +3,7 @@ from typing import Optional, List, Dict, Any
 import ollama
 import asyncio
 from loguru import logger
-
+import json
 
 '''
 
@@ -17,12 +17,12 @@ deactivate
 apt-get update
 apt-get install -y --reinstall python3-pip python3-venv python3-setuptools
 pip install -r requirements.txt
-expose port 8000 in the runpod
+*expose port 8000 in the runpod*
 
 
 Run ollama with:
 pkill ollama
-OLLAMA_NUM_PARALLEL=8 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
+OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=16 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 
 Run fastapi with (change port per machine):
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
@@ -31,7 +31,7 @@ uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
 # Curl the data to the llm, make sure to update host name and update port to match uvicorn's fastapi
 curl -X POST "https://h03j78mprz9sxw-8000.proxy.runpod.net/enrich_products" \
      -H "Content-Type: application/json" \
-     --data @app-mvp/data/large_products_list.json
+     --data @data/large_products_list.json
 
 '''
 
@@ -87,27 +87,33 @@ def build_prompt_key_value(item: EnrichRequestItem):
 
 
 async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]]:
-    """
-    Makes an API call using the official Ollama SDK for reliable structured output, 
-    validates the output, and ensures the identifier is included.
-    """
+    # ... (imports needed: from pydantic import BaseModel, Field, etc.)
     client = ollama.AsyncClient(host='http://localhost:11434')
     prompt = build_prompt_key_value(item)
-    content = "" # Initialize content variable for error logging
+    content = ""
     unique_id = item.sku if item.sku else item.product_name
+
+    # 1. Generate the JSON Schema string
+    product_schema_dict = ProductAttributes.model_json_schema()
+
+    # Convert the dictionary to a formatted string representation
+    product_schema_string = json.dumps(product_schema_dict, indent=2)
+
+
+    # 2. Embed the schema into your System Prompt
+    system_prompt_content = (
+        'You are a ultra-concise data formatting AI. '
+        'Your ONLY task is to generate a VALID and COMPLETE JSON object '
+        'based on the user request and schema provided. Use only the exact keys from the schema. '
+        'No conversational filler or extra words. '
+        '\n\n### JSON Schema to follow:\n' + product_schema_string # This concatenation is now valid
+    )
 
     try:
         response = await client.chat(
-            model='phi3',
+            model='phi3', # FIX 2: Use the registered name
             messages=[
-                {'role': 'system', 'content': 'You are a ultra-concise data formatting AI. '
-                'Your ONLY task is to generate a '
-                'VALID and COMPLETE JSON object based on the user request and schema '
-                'provided. Respond with nothing else. '
-                'No conversational filler or extra words. '
-                'No extraneous details or explanations'
-                'Be direct and analytical. '
-                'Each json field must be less than 10 tokens.'},
+                {'role': 'system', 'content': system_prompt_content}, # Use the new prompt
                 {'role': 'user', 'content': prompt},
             ],
             options={
@@ -115,32 +121,26 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
                 'num_ctx': 500,
                 'num_predict': 100
             },
-            format=ProductAttributes.model_json_schema(), 
+            format="json", # FIX 3: Use the literal string "json"
         )
-
-        content = response['message']['content'].strip()
+        
+        # FIX 4: Access content safely (adjust if SDK structure is different)
+        content = response['message']['content'].strip() 
 
         # Validate the LLM output using Pydantic
         validated_product = ProductAttributes.model_validate_json(content)
-
-        # Convert to dictionary immediately after validation
         validated_product_dict = validated_product.model_dump()
 
-        # Ensure the identifier field matches the Pydantic output schema field name
-        # We can trust this because Pydantic already validated that this field exists
         validated_product_dict['identifier'] = unique_id 
         
         return validated_product_dict
-
-    except ValidationError as e:
-        logger.error(f"Pydantic validation failed for item '{unique_id}'. Error: {e}")
-        logger.error(f"Problematic content was: \n---\n{content}\n---\n")
-        return None # Return None if validation fails
-
+    
     except Exception as e:
-        logger.error(f"Ollama API call failed for item '{unique_id}'. Error: {e}")
-        logger.error(f"Problematic content was: \n---\n{content}\n---\n")
-        return None # Return None for other API errors
+        # Log the problematic content if validation fails for debugging Pydantic errors
+        print(f"Ollama API call failed for item '{unique_id}'. Error: {e}")
+        print(f"Problematic content was: ---{content}---")
+        return None # Or raise the exception if you prefer
+
 
 # you need to add the type hints (List, Dict, Any) and import them from the typing module.
 async def process_data_api_concurrently_async(data_list: list[EnrichRequestItem]) -> List[Dict[str, Any]]:
