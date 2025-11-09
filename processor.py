@@ -7,31 +7,32 @@ import json
 
 '''
 
-If you need to terminate for a new gpu, run these in order to sync with git repo:
+If you need to terminate for a new gpu, run these in order
+
+*expose port 8000 in the runpod*
 
 git config --global user.email "noahdouglasgarner@gmail.com"
 git config --global user.name Noah Garner
 cp -r .ssh/* /root/.ssh/
 chmod 600 /root/.ssh/*
 deactivate
-apt-get update
-apt-get install -y --reinstall python3-pip python3-venv python3-setuptools
+cd mvp/
 pip install -r requirements.txt
-*expose port 8000 in the runpod*
 
+(Only need to run chmod 755 start.sh && ./start.sh if you build a new workspace)
 
 Run ollama with:
 pkill ollama
-OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=24 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
+OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 
 Run fastapi with (change port per machine):
 uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
 
 
 # Curl the data to the llm, make sure to update host name and update port to match uvicorn's fastapi
-curl -X POST "https://zfvzra5n6ryvu0-8000.proxy.runpod.net/enrich_products" \
+curl -X POST "https://heuzrxi4l1brf4-8000.proxy.runpod.net/enrich_products" \
      -H "Content-Type: application/json" \
-     --data @data/medium_products_list.json
+     --data @data/large_products_list.json
 
 '''
 
@@ -46,8 +47,8 @@ class ProductAttributes(BaseModel):
     # Rename 'sku' to 'identifier' or 'original_name' to be explicit
     identifier: str = Field(description="The unique identifier from the input (usually the product name or SKU).")
     product_type: str = Field(description="The general category of the product.")
-    brand: str = Field(description="The brand name.")
-    size_quantity: str = Field(description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
+    brand: Optional[str] = Field(description="The brand name.")
+    size_quantity: str = Field(alias="size quantity", description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
 
 
 # Define the *Input* schema for the API endpoint (Standardized keys)
@@ -121,7 +122,7 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
                 'num_ctx': 500,
                 'num_predict': 100
             },
-            format="json", # FIX 3: Use the literal string "json"
+            format="json",
         )
         
         # FIX 4: Access content safely (adjust if SDK structure is different)
@@ -142,18 +143,25 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
         return None # Or raise the exception if you prefer
 
 
-# you need to add the type hints (List, Dict, Any) and import them from the typing module.
-async def process_data_api_concurrently_async(data_list: list[EnrichRequestItem]) -> List[Dict[str, Any]]:
+# Function to chunk a list into smaller batches
+def chunk_list(data_list, batch_size):
+    for i in range(0, len(data_list), batch_size):
+        yield data_list[i:i + batch_size]
 
-    tasks = [call_llm_api_async(data) for data in data_list]
-
-    results = await asyncio.gather(*tasks, return_exceptions=True)
-
-    results_dicts = []
-    for result in results:
-        if isinstance(result, dict): 
-            results_dicts.append(result)
-        elif isinstance(result, Exception):
-             logger.info(f"An async task failed with error: {result}")
-            
-    return results_dicts
+async def process_data_api_concurrently_async(all_items: List[EnrichRequestItem]):
+    
+    # Use a BATCH_SIZE that you know won't crash (e.g., 10 or 12 items)
+    BATCH_SIZE = 20
+    all_results = []
+    
+    for batch in chunk_list(all_items, BATCH_SIZE):
+        # Process this small batch
+        tasks = [call_llm_api_async(item) for item in batch]
+        results = await asyncio.gather(*tasks, return_exceptions=True)
+        
+        # ... (process results) ...
+        all_results.extend(results)
+        
+        # Memory will accumulate until all batches are done or system is idle for >1s
+    
+    return all_results
