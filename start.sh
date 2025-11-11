@@ -38,4 +38,5 @@ cat <<EOF > "$SETTINGS_FILE"
 }
 EOF
 
+# Run code server
 exec /usr/bin/code-server --bind-addr 0.0.0.0 --port 7777 --auth none .

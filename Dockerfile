@@ -14,6 +14,8 @@ RUN curl -fsSL https://code-server.dev/install.sh | sh
 
 WORKDIR /workspace/mvp
 
+COPY requirements.txt .
+
 RUN pip install --break-system-packages --ignore-installed -r requirements.txt
 
 EXPOSE 11434 7777 8050 8000
