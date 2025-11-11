@@ -5,6 +5,9 @@ import asyncio
 from loguru import logger
 import os
 '''
+This is mounted, changes will remain regardless of pushing to github or not
+
+
 CICD is push to docker, wait for build, terminate pod and spin up for latest image
  
 Go to the project

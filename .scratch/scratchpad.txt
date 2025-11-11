@@ -11,3 +11,11 @@ I wonder if there are more interesting ways to monetize this whole thing...
 I mean, I can basically do everything now.. I shouldn't need anyone until I'm
 making a ton of money somehow, and by then I should be hiring people only to 
 take over what I've built so I can chill
+
+Looks like I fixed the gpu issue! Having control over the image is an absolutel 
+hard requirement going forward
+
+Test make sure dyamic variable works, then gym time
+
+After the gym I'm sure there will be lots of kinks to work out, but it will be nice to
+see if we can get 4090 runs in by tonight with personal custom environment
