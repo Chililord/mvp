@@ -6,8 +6,6 @@ from loguru import logger
 import os
 '''
 CICD is push to docker, wait for build, terminate pod and spin up for latest image
-
-expose port 8000 for fastapi and 8050 for dash
  
 Go to the project
 cd mvp/

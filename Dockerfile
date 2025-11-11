@@ -17,7 +17,7 @@ WORKDIR /app
 COPY requirements.txt .
 COPY start.sh .
 
-COPY assets/ .
+COPY assets/ assets/
 COPY component.py .
 COPY callbacks.py .
 COPY app_fastapi.py .
@@ -26,6 +26,6 @@ COPY processor.py .
 
 RUN pip install --break-system-packages --ignore-installed -r requirements.txt
 
-EXPOSE 11434 7777
+EXPOSE 11434 7777 8050 8000
 
 CMD ["./start.sh"]

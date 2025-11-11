@@ -9,6 +9,10 @@ mkdir -p /root/.ssh/
 cp -r /workspace/.ssh/* /root/.ssh/
 chmod 600 /root/.ssh/*
 
+# ollama configs
+export OLLAMA_HOST=0.0.0.0
+ollama serve &
+
 # Start fastapi
 uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload &
 

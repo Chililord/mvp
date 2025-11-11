@@ -6,3 +6,8 @@ Value:  $RUNPOD_POD_ID     (Dynamically updated)
 
 .env file required for the others, it's simpler. But because the routes rely on
 the generated pod, runpid_id must be passed at pod build time
+
+I wonder if there are more interesting ways to monetize this whole thing...
+I mean, I can basically do everything now.. I shouldn't need anyone until I'm
+making a ton of money somehow, and by then I should be hiring people only to 
+take over what I've built so I can chill
