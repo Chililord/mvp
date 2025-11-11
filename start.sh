@@ -11,7 +11,8 @@ chmod 600 /root/.ssh/*
 
 
 # Keeps container running 2 for 1!
-exec /usr/bin/code-server --port 7777 --bind-addr 0.0.0.0 --auth none .
+tail -f /dev/null
+
 
 echo "--- Configuration complete ---"
 
