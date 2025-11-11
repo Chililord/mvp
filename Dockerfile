@@ -23,7 +23,6 @@ COPY app_fastapi.py .
 COPY app_dash.py .
 COPY processor.py .
 
-RUN python3 -m venv venv
 RUN pip install --ignore-installed -r requirements.txt
 
 EXPOSE 11434 7777
