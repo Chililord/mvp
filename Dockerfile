@@ -6,12 +6,10 @@ RUN apt-get update && apt-get install -y \
     python3-venv \
     git \
     curl \
-    && rm -rf /var/lib/apt/lists/*
-
-RUN curl -fsSL https://ollama.com/install.sh | sh
-
-RUN curl -fsSL https://code-server.dev/install.sh | sh
-
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL https://ollama.com/install.sh | sh \
+    && curl -fsSL https://code-server.dev/install.sh | sh
+    
 WORKDIR /workspace/mvp
 
 COPY requirements.txt .

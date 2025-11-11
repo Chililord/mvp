@@ -42,7 +42,7 @@ pkill ollama
 
 
 # Start fastapi
-uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload &
+uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload --env-file .env &
 
 # Start the dash app
 PYTHONDONTWRITEBYTECODE=1 python3 -m app_dash &

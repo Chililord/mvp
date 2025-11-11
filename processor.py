@@ -9,7 +9,6 @@ CICD is push to docker, wait for build, terminate pod and spin up for latest ima
  
 
 Run ollama:
-A50000
 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 pkill ollama
 
