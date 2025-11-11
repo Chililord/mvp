@@ -17,6 +17,7 @@ WORKDIR /app
 COPY requirements.txt .
 COPY start.sh .
 
+COPY assets/ .
 COPY component.py .
 COPY callbacks.py .
 COPY app_fastapi.py .
