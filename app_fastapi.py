@@ -82,5 +82,9 @@ async def upload_and_enrich_csv_endpoint(file: UploadFile = File(...)):
     # In case user had some "bad" rows, replace NaNs introduced by the LEFT MERGE w/ NONE
     df_original_and_enriched = df_original_and_enriched.replace({np.nan: None})
     
+
+    df_original_and_enriched.to_csv(OUTPUT_DIR, index=False)
+
+
     # --- For API functionality: Return the data ---
     return df_original_and_enriched.to_dict(orient='records')

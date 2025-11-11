@@ -6,7 +6,7 @@ from loguru import logger
 import os
 '''
 CICD is push to docker, wait for build, terminate pod and spin up for latest image
- 
+
 
 Run ollama:
 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
@@ -15,10 +15,12 @@ pkill ollama
 Run fastapi runpod:
 uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload --env-file .env
 Run fastapi local:
-APP_ENV=local python -m uvicorn main:app --host 0.0.0.0 --port 8000
+APP_ENV=local python -m uvicorn app_fastapi:app --host 0.0.0.0 --port 8000
 pkill uvicorn
 
 Run dash
+sudo lsof -i :8050
+kill xxxxxxx
 PYTHONDONTWRITEBYTECODE=1 python -m app_dash
 
 

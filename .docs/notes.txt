@@ -1,0 +1,2 @@
+Fuck it this shit is a total mess without virtual environments, this is basically a necessity
+So I'll setup the venv locally and remote and be done with it

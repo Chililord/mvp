@@ -9,12 +9,16 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && curl -fsSL https://ollama.com/install.sh | sh \
     && curl -fsSL https://code-server.dev/install.sh | sh
-    
+
 WORKDIR /workspace/mvp
 
 COPY requirements.txt .
 
-RUN pip install --break-system-packages --ignore-installed -r requirements.txt
+RUN python3 -m venv .venv
+
+ENV PATH="/workspace/mvp/.venv/bin:$PATH"
+
+RUN pip install --ignore-installed -r requirements.txt
 
 EXPOSE 11434 7777 8050 8000
 

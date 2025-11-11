@@ -29,9 +29,15 @@ def register_data_callbacks(app_dash):
         )
     def enrich_data(n_clicks, contents, filename):
 
-        runpod = os.getenv("RUNPOD_ID")
+        if os.environ['APP_ENV'] == 'local':
 
-        fastappi_endpoint = f"https://{runpod}-8000.proxy.runpod.net/enrich_products"
+            fastapi_endpoint = "http://0.0.0.0:8000/enrich_products"
+
+        else:
+
+            runpod = os.getenv("RUNPOD_ID")
+
+            fastapi_endpoint = f"https://{runpod}-8000.proxy.runpod.net/enrich_products"
 
         content_type, content_string = contents.split(',')
         decoded = base64.b64decode(content_string)
@@ -41,7 +47,7 @@ def register_data_callbacks(app_dash):
 
             logger.info("Posting from Dash to fastapi endpoint")
 
-            response = requests.post(fastappi_endpoint, files=files)
+            response = requests.post(fastapi_endpoint, files=files)
             
             if response.status_code == 200:
                 enriched_data_list = response.json()
