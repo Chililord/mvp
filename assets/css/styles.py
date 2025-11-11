@@ -6,9 +6,28 @@ upload_style = {
     "borderStyle": "dashed",
     "borderRadius": "5px",
     "textAlign": "center",
-    "margin": "10px",
     "position": "relative",
 }
+
+button_active_style = {
+    "width": "100%",  # Use 100% width, managed by the parent flex container
+    "height": "60px",
+    "lineHeight": "60px",
+    "borderWidth": "1px",
+    "borderStyle": "solid",  # Changed to solid border for buttons
+    "borderRadius": "5px",
+    "textAlign": "center",
+    "position": "relative",
+    "cursor": "pointer",     # Changes mouse cursor to a hand pointer
+    "backgroundColor": "#007bff", # A standard blue color
+    "color": "white",        # White text for contrast
+}
+
+# Style for when the button is DISABLED (grey, not clickable)
+button_disabled_style = button_active_style.copy()
+button_disabled_style["backgroundColor"] = "#cccccc" # Grayed out background
+button_disabled_style["color"] = "#666666"            # Darker text
+button_disabled_style["cursor"] = "not-allowed"      # Changes mouse cursor to a not-allowed symbol
 
 
 response_style = {

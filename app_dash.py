@@ -11,14 +11,21 @@ def create_app_dash():
     logger.info("setting up app_dash")
 
     # Define the absolute path to the assets folder
-    assets_path = "/workspace/mvp/assets"
+
+
+    # Define the absolute path to the assets folder reliably
+    # Use pathlib to construct the absolute path if running locally
+    if os.environ['APP_ENV'] == 'local':
+        assets_path = pathlib.Path(__file__).parent.resolve() / "assets"
+    else:
+        # Default to runpod path if needed
+        assets_path = "/workspace/mvp/assets"
 
     app_dash = DashProxy(
-            # Must specify both otherwise gunicorn fails to resolve assets dir
             requests_pathname_prefix="/dash/",
-            routes_pathname_prefix="/dash/",
             external_stylesheets=[dbc.themes.DARKLY],
-            assets_folder=assets_path
+            assets_folder=assets_path # Provide the absolute path here
+
         )
 
     configure_dev_tools(app_dash, os.getenv("ENVIRONMENT", "DEV"))
@@ -49,12 +56,3 @@ def configure_dev_tools(app, env):
 
 
     app.enable_dev_tools(**dev_tools_options)
-
-
-app_dash = create_app_dash()
-
-
-# This only executes when the python file runs as the main program
-# ie. for local development docker compose
-if __name__ == '__main__':
-    app_dash.run(debug=True, host='0.0.0.0', port=8050)

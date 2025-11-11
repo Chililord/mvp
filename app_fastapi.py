@@ -1,18 +1,18 @@
+# Middleware
 from fastapi import FastAPI, HTTPException, File, UploadFile
-from typing import List
+from fastapi.responses import FileResponse
+# Backend
 from processor import EnrichRequestItem, process_data_api_concurrently_async
-import os
+from a2wsgi import WSGIMiddleware
+
+# Frontend
+from app_dash import create_app_dash
 from pathlib import Path
-import json
 from loguru import logger
 import pandas as pd
 import numpy as np
 import io 
-
-app = FastAPI(
-    title="Product Attribute Enrichment API",
-    description="An API service to enrich raw product data using a cloud gpu enabled LLM accelerator."
-)
+import os
 
 # Define base paths regardless of environment
 LOCAL_BASE = Path("/Users/intuitivecode/Code/mvp")
@@ -25,6 +25,12 @@ else:
     BASE_DIR = RUNPOD_BASE
 
 OUTPUT_DIR = BASE_DIR / "data"
+
+app = FastAPI()
+
+dash_app_instance = create_app_dash()
+
+app.mount("/dash/", WSGIMiddleware(dash_app_instance.server))
 
 
 @app.post("/enrich_products", summary="Enrich a list of product items")
@@ -70,7 +76,6 @@ async def upload_and_enrich_csv_endpoint(file: UploadFile = File(...)):
     except Exception as e:
          raise HTTPException(status_code=422, detail=f"Data validation error in CSV rows: {str(e)}")
 
-    # ... (rest of your processing logic) ...
     enriched_results = await process_data_api_concurrently_async(items_for_processing)
 
     df_enriched = pd.DataFrame(enriched_results)
@@ -81,10 +86,29 @@ async def upload_and_enrich_csv_endpoint(file: UploadFile = File(...)):
 
     # In case user had some "bad" rows, replace NaNs introduced by the LEFT MERGE w/ NONE
     df_original_and_enriched = df_original_and_enriched.replace({np.nan: None})
-    
 
-    df_original_and_enriched.to_csv(OUTPUT_DIR, index=False)
+
+    df_original_and_enriched.to_csv(OUTPUT_DIR / "enrichment_results.csv", index=False)
 
 
     # --- For API functionality: Return the data ---
     return df_original_and_enriched.to_dict(orient='records')
+
+
+
+@app.get("/download-results")
+def download_results_csv():
+
+    logger.info("Where's the data?")
+
+    file_path = OUTPUT_DIR / "enrichment_results.csv"
+    if file_path.exists():
+        return FileResponse(
+            path=file_path, 
+            media_type='text/csv', 
+            filename="enrichment_results.csv",
+            headers={"Content-Disposition": "attachment; filename=enrichment_results.csv"}
+        )
+    else:
+        # Handle case where the file hasn't been generated yet
+        return {"error": "File not found. Please run the enrichment process first."}

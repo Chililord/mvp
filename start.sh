@@ -41,11 +41,9 @@ rm /tmp/Modelfile
 pkill ollama
 
 
-# Start fastapi
+# Start fastapi + dash
 uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload --env-file .env &
 
-# Start the dash app
-PYTHONDONTWRITEBYTECODE=1 python3 -m app_dash &
 
 echo "--- Configuration complete ---"
 

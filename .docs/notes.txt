@@ -1,2 +1,2 @@
-Fuck it this shit is a total mess without virtual environments, this is basically a necessity
-So I'll setup the venv locally and remote and be done with it
+Add database, and update fastapi download data callback.
+The clientside callback does not need to change therefroe this part is done

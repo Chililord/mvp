@@ -13,3 +13,4 @@ ollama
 loguru
 pandas
 numpy
+a2wsgi

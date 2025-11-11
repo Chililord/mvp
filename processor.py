@@ -7,33 +7,15 @@ import os
 '''
 CICD is push to docker, wait for build, terminate pod and spin up for latest image
 
-
 Run ollama:
-OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
-pkill ollama
+    OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 
-Run fastapi runpod:
-uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload --env-file .env
-Run fastapi local:
-APP_ENV=local python -m uvicorn app_fastapi:app --host 0.0.0.0 --port 8000
-pkill uvicorn
+Run fastapi + dash runpod:
+    uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload --env-file .env
 
-Run dash
-sudo lsof -i :8050
-kill xxxxxxx
-PYTHONDONTWRITEBYTECODE=1 python -m app_dash
+Run fastapi local + dash:
+    python -m uvicorn app_fastapi:app --host localhost --port 8000 --reload --env-file .env
 
-
-curl data
-runpod
-curl -X POST "https:/yfswgjk96za5e4-8000.proxy.runpod.net/enrich_products" \
-     -H "Content-Type: application/json" \
-     --data @data/medium_products_list.json
-
-local
-curl -X POST "http://localhost:8000/docs/enrich_products" \
-     -H "Content-Type: application/json" \
-     --data @data/medium_products_list.json
 
 '''
 
@@ -42,11 +24,11 @@ class ProductAttributes(BaseModel):
     # Rename 'sku' to 'identifier' or 'original_name' to be explicit
     identifier: str = Field(description="The unique identifier from the input (usually the product name or SKU).")
     product_type: str = Field(description="The general category of the product.")
-    brand: Optional[str] = Field(description="The brand name.")
-    size_quantity: Optional[str] = Field(alias="size quantity", description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
-    price: Optional[float] = Field(description="The numeric value of the product's price, or null if not available.")
-    currency: Optional[str] = Field(description="The three-letter ISO 4217 currency code (e.g., USD, EUR), or null if not available.")
-    availability: Optional[str] = Field(description="The product's availability status (e.g., in stock, out of stock, preorder), or null if not available.")
+    # brand: Optional[str] = Field(description="The brand name.")
+    # size_quantity: Optional[str] = Field(alias="size quantity", description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
+    # price: Optional[float] = Field(description="The numeric value of the product's price, or null if not available.")
+    # currency: Optional[str] = Field(description="The three-letter ISO 4217 currency code (e.g., USD, EUR), or null if not available.")
+    # availability: Optional[str] = Field(description="The product's availability status (e.g., in stock, out of stock, preorder), or null if not available.")
 
 
 # Received from user. Only product_name is required
@@ -55,10 +37,8 @@ class EnrichRequestItem(BaseModel):
     product_description: Optional[str] = Field(None, description="[OPTIONAL] Additional descriptive text for improved accuracy.")
     manufacturer: Optional[str] = Field(None, description="[OPTIONAL] The legal manufacturer of the product.")
     sku: Optional[str] = Field(None, description="[OPTIONAL] Your internal Stock Keeping Unit (SKU) or MPN.")
-    target_market: Optional[str] = Field(None, description="[OPTIONAL] The intended market audience (e.g., B2B, consumer).")
-    user_defined_tags: Optional[str] = Field(None, description="[OPTIONAL] Existing tags or category hints from your system.")
-    # Used as join key later
-    sku: Optional[str] = Field(None, description="[OPTIONAL] Your internal Stock Keeping Unit (SKU) or MPN.") 
+    # target_market: Optional[str] = Field(None, description="[OPTIONAL] The intended market audience (e.g., B2B, consumer).")
+    # user_defined_tags: Optional[str] = Field(None, description="[OPTIONAL] Existing tags or category hints from your system.")
 
 
 
@@ -79,7 +59,7 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
     client = ollama.AsyncClient(host='http://localhost:11434')
     prompt = build_prompt_key_value(item)
     content = ""
-    unique_id = item.sku if item.sku else item.product_name
+    unique_id = item.sku if item.sku is not None and item.sku != '' else item.product_name
 
     # 2. Embed the schema into your System Prompt
     system_prompt_content = (

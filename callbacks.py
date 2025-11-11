@@ -1,22 +1,21 @@
-from dash import Input, Output, State, clientside_callback
-import dash
+from dash import Input, Output, State, clientside_callback, html
+from assets.css.styles import *
 from loguru import logger
 import requests
 import base64
 import io 
 import os
 
-import dash_html_components as html 
-
 def register_data_callbacks(app_dash):
 
     @app_dash.callback(
         Output('submit-button', 'disabled'),
+        Output('submit-button', 'style'),
         Input('upload-data', 'filename')
     )
-    def toggle_submit_button(contents):
+    def toggle_submit_button(filename):
+        return (True, button_disabled_style) if filename is None else (False, button_active_style)
 
-        return contents is None
 
     @app_dash.callback(
             Output("upload-status-message", "children"),
@@ -38,7 +37,7 @@ def register_data_callbacks(app_dash):
             runpod = os.getenv("RUNPOD_ID")
 
             fastapi_endpoint = f"https://{runpod}-8000.proxy.runpod.net/enrich_products"
-
+        
         content_type, content_string = contents.split(',')
         decoded = base64.b64decode(content_string)
 
@@ -70,3 +69,29 @@ def register_data_callbacks(app_dash):
 
         except Exception as e:
             return html.Div(f"An error occurred: {str(e)}", style={'color': 'red'}), [], []
+
+
+
+    @app_dash.callback(
+        Output('download-button', 'disabled'),
+        Output('download-button', 'style'),
+        Input('enriched-data-table', 'data')
+    )
+    def toggle_download_button(table_data):
+        return (True, button_disabled_style) if not bool(table_data) else (False, button_active_style)
+
+    clientside_callback(
+        """
+        function(n_clicks) {
+            if (n_clicks > 0) {
+                // This forces the browser to navigate to the URL and initiate the download prompt
+                window.location.href = '/download-results'; 
+            }
+            // Return a dummy value, since the action is handled client-side
+            return '';
+        }
+        """,
+        Output('url', 'href'), 
+        Input('download-button', 'n_clicks'),
+        prevent_initial_call=True
+    )
