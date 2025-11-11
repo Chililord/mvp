@@ -1,8 +1,3 @@
-Well, the engine is built. It needs a LOT of refinement, next steps are crucial
+Fuck it really doesn't want me to make a docker file. Just use a start.sh script
 
-Do we refine further, do we get feedback, do we improve data quality?
-
-The file I uploaded is a worst case scenario file with tons of missing data, there's that
-
-I still think adding a text field for 1 json input would be cool for users,
-implement that then get feedback
+This is so weird but I hope it worksdoo

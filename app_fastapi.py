@@ -14,7 +14,6 @@ app = FastAPI(
     description="An API service to enrich raw product data using a cloud gpu enabled LLM accelerator."
 )
 
-
 # Define base paths regardless of environment
 LOCAL_BASE = Path("/Users/intuitivecode/Code/mvp")
 RUNPOD_BASE = Path("/workspace/mvp")
@@ -51,7 +50,7 @@ async def upload_and_enrich_csv_endpoint(file: UploadFile = File(...)):
     # 2. Identify which expected fields are actually in the user's CSV
     csv_columns = set(df_original.columns)
     valid_columns_to_keep = list(expected_fields.intersection(csv_columns))
-    
+
     # 3. Ensure the required field is present
     REQUIRED_FIELD = "product_name" 
     if REQUIRED_FIELD not in valid_columns_to_keep:
@@ -84,4 +83,4 @@ async def upload_and_enrich_csv_endpoint(file: UploadFile = File(...)):
     df_original_and_enriched = df_original_and_enriched.replace({np.nan: None})
     
     # --- For API functionality: Return the data ---
-    return df_original_and_enriched.to_dict(orient='records') # <-- Correct way
+    return df_original_and_enriched.to_dict(orient='records')

@@ -13,13 +13,21 @@ cd mvp/
 Build stuff
 ./start.sh
 
+Get docker and build images on runpod:
+curl -fsSL https://get.docker.com -o get-docker.sh
+sh get-docker.sh
+
+update RUNPOD in .env
+source .env
+
 Run ollama:
+A50000
 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 
 Run fastapi local/runpod:
 cd mvp/
 uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload --env-file .env
-APP_ENV=local python -m uvicorn maini:app --host 0.0.0.0 --port 8000
+APP_ENV=local python -m uvicorn main:app --host 0.0.0.0 --port 8000
 
 Run dash and visit https://yfswgjk96za5e4-8050.proxy.runpod.net/dash/
 cd mvp/
@@ -39,15 +47,7 @@ curl -X POST "http://localhost:8000/docs/enrich_products" \
 
 '''
 
-# NOTE: The Phi-3 model prefers to be helpful and descriptive. 
-# When it can't find a brand name, its default behavior is to provide a helpful 
-# explanation (like "No specific brand mentioned, hence empty string returned as 
-# placeholder.") rather than strictly following your formatting rule of just returning 
-# the simple string 'empty'
-# something to note in case a bunch of data is not generated when expected for a column
-# like brand name. This is VERY important to note
-
-# INCREASES BOTH INPUT + OUTPUT, FED TO PROMPT + RETURNED TO USER
+# Produced for user. Increased tokens used by a lot
 class ProductAttributes(BaseModel):
     # Rename 'sku' to 'identifier' or 'original_name' to be explicit
     identifier: str = Field(description="The unique identifier from the input (usually the product name or SKU).")
@@ -59,9 +59,7 @@ class ProductAttributes(BaseModel):
     availability: Optional[str] = Field(description="The product's availability status (e.g., in stock, out of stock, preorder), or null if not available.")
 
 
-
-
-# Define the *Input* schema for the API endpoint (Standardized keys)
+# Received from user. Only product_name is required
 class EnrichRequestItem(BaseModel):
     product_name: str = Field(..., description="[REQUIRED] The primary name of the product.")
     product_description: Optional[str] = Field(None, description="[OPTIONAL] Additional descriptive text for improved accuracy.")
@@ -163,5 +161,4 @@ async def process_data_api_concurrently_async(all_items: List[EnrichRequestItem]
         
         all_results.extend(results)
         
-    
     return all_results

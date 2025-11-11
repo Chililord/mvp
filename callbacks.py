@@ -4,6 +4,7 @@ from loguru import logger
 import requests
 import base64
 import io 
+import os
 
 import dash_html_components as html 
 
@@ -28,7 +29,9 @@ def register_data_callbacks(app_dash):
         )
     def enrich_data(n_clicks, contents, filename):
 
-        fastappi_endpoint = "https://yfswgjk96za5e4-8000.proxy.runpod.net/enrich_products"
+        runpod = os.getenv("RUNPOD")
+
+        fastappi_endpoint = f"https://{runpod}-8000.proxy.runpod.net/enrich_products"
 
         content_type, content_string = contents.split(',')
         decoded = base64.b64decode(content_string)
