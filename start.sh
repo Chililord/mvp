@@ -10,10 +10,10 @@ cp -r /workspace/.ssh/* /root/.ssh/
 chmod 600 /root/.ssh/*
 
 # Start fastapi
-uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload
+uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload &
 
 # Start the dash app
-PYTHONDONTWRITEBYTECODE=1 python3 -m app_dash
+PYTHONDONTWRITEBYTECODE=1 python3 -m app_dash &
 
 echo "--- Configuration complete ---"
 
