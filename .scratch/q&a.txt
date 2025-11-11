@@ -2296,3 +2296,11 @@ Keep it Simple for MVP:
 An MVP is about validating the core business value with the 
 least amount of engineering effort. 
 The current system validates that value perfectly.
+
+Q:
+What did you learn about the workdir special case with network volume?
+A:
+So what I have setup is the Dockerfile runs the pip install with reqs.txt in /workdir/mvp,
+then before start script is executed, the network storage volume is mounted containing my
+git repo. This contains all the files which are specified by the start.sh script, very
+clean solution for building quickly and efficiently! Wow. I'm smart as fuck haha

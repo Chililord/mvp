@@ -5,35 +5,21 @@ import asyncio
 from loguru import logger
 import os
 '''
-This is mounted, changes will remain regardless of pushing to github or not
-
-
 CICD is push to docker, wait for build, terminate pod and spin up for latest image
  
-Go to the project
-cd mvp/
-
-Build stuff
-./start.sh
-
-Get docker and build images on runpod:
-curl -fsSL https://get.docker.com -o get-docker.sh
-sh get-docker.sh
-
-update RUNPOD in .env
-source .env
 
 Run ollama:
 A50000
 OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
+pkill ollama
 
-Run fastapi local/runpod:
-cd mvp/
+Run fastapi runpod:
 uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload --env-file .env
+Run fastapi local:
 APP_ENV=local python -m uvicorn main:app --host 0.0.0.0 --port 8000
+pkill uvicorn
 
-Run dash and visit https://yfswgjk96za5e4-8050.proxy.runpod.net/dash/
-cd mvp/
+Run dash
 PYTHONDONTWRITEBYTECODE=1 python -m app_dash
 
 

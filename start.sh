@@ -1,6 +1,8 @@
 #!/bin/bash
 echo "--- Running initial setup configuration ---"
 
+# So no bytecode when we run uvicorn or dash
+source .env
 
 git config --global user.email "noahdouglasgarner@gmail.com"
 git config --global user.name "Noah Garner"
@@ -14,6 +16,30 @@ export OLLAMA_HOST=0.0.0.0
 
 # Start ollama
 ollama serve &
+# --- 2. Health Check Loop: Wait for Ollama to be ready ---
+echo "Waiting for Ollama server to become available on port 11434..."
+
+TIMEOUT=30  # Timeout after 30 seconds
+until printf "" 2>>/dev/null >>/dev/tcp/localhost/11434; do
+  ((TIMEOUT--))
+  if [ $TIMEOUT -le 0 ]; then
+    echo "Ollama server health check timed out. Exiting."
+    exit 1
+  fi
+  sleep 1 # Wait for 1 second before checking again
+done
+
+echo "Ollama server is now available."
+
+# --- 3. Import local GGUF model (Ollama is ready now) ---
+GGUF_PATH="/workspace/phi3_quantized_model/Phi-3-mini-4k-instruct-q4.gguf"
+MODEL_NAME="local-phi3-quantized"
+echo "FROM $GGUF_PATH" > /tmp/Modelfile
+ollama create $MODEL_NAME -f /tmp/Modelfile
+rm /tmp/Modelfile
+
+pkill ollama
+
 
 # Start fastapi
 uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload &
