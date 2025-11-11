@@ -5,7 +5,7 @@ import asyncio
 from loguru import logger
 import os
 '''
-PAT: ls 
+
 
 expose port 8000 for fastapi and 8050 for dash
  
