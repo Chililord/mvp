@@ -12,17 +12,7 @@ RUN curl -fsSL https://ollama.com/install.sh | sh
 
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-WORKDIR /app
-
-COPY requirements.txt .
-COPY start.sh .
-
-COPY assets/ assets/
-COPY component.py .
-COPY callbacks.py .
-COPY app_fastapi.py .
-COPY app_dash.py .
-COPY processor.py .
+WORKDIR /workspace/mvp
 
 RUN pip install --break-system-packages --ignore-installed -r requirements.txt
 

@@ -23,5 +23,19 @@ PYTHONDONTWRITEBYTECODE=1 python3 -m app_dash &
 
 echo "--- Configuration complete ---"
 
-# Start code-server, keep container alive
+# --- Configure Code-Server Settings (Dark Mode) ---
+CONFIG_DIR="/root/.config/code-server"
+SETTINGS_FILE="$CONFIG_DIR/settings.json" 
+
+mkdir -p "$CONFIG_DIR"
+
+# Create/overwrite the settings file with JSON configuration for dark mode and trust
+cat <<EOF > "$SETTINGS_FILE"
+{
+  "workbench.colorTheme": "Default Dark+",
+  "security.workspace.trust.startupPrompt": "never",
+  "security.workspace.trust.enabled": false
+}
+EOF
+
 exec /usr/bin/code-server --bind-addr 0.0.0.0 --port 7777 --auth none .
