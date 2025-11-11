@@ -29,7 +29,7 @@ def register_data_callbacks(app_dash):
         )
     def enrich_data(n_clicks, contents, filename):
 
-        runpod = os.getenv("RUNPOD")
+        runpod = os.getenv("RUNPOD_ID")
 
         fastappi_endpoint = f"https://{runpod}-8000.proxy.runpod.net/enrich_products"
 

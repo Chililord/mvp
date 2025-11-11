@@ -9,10 +9,13 @@ mkdir -p /root/.ssh/
 cp -r /workspace/.ssh/* /root/.ssh/
 chmod 600 /root/.ssh/*
 
+# Start fastapi
+uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload
 
-# Keeps container running 2 for 1!
-tail -f /dev/null
-
+# Start the dash app
+PYTHONDONTWRITEBYTECODE=1 python3 -m app_dash
 
 echo "--- Configuration complete ---"
 
+# Start code-server, keep container alive
+exec /usr/bin/code-server --bind-addr 0.0.0.0 --port 7777 --auth none .

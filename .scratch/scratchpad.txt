@@ -1,3 +1,8 @@
-Fuck it really doesn't want me to make a docker file. Just use a start.sh script
+You configure the runpod to inject the env var at launch time. Ah
 
-This is so weird but I hope it worksdoo
+In environment variables section:
+Key:    RUNPOD_ID
+Value:  $RUNPOD_POD_ID     (Dynamically updated)
+
+.env file required for the others, it's simpler. But because the routes rely on
+the generated pod, runpid_id must be passed at pod build time

@@ -1,29 +1,31 @@
-FROM nvidia/cuda:12.3.1-runtime-ubuntu22.04
+FROM nvidia/cuda:12.3.1-runtime-ubuntu24.04
 
-# Install Python and its venv module
-RUN apt-get update && apt-get install -y python3 python3-pip python3-venv git && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-venv \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
 
-# Install Ollama
 RUN curl -fsSL https://ollama.com/install.sh | sh
 
-# Install Code-Server
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
-# Set a standard working directory inside the container for your application files
 WORKDIR /app
 
-# Copy your local application files into the image during the BUILD phase
-# (Assuming requirements.txt and start.sh are in the same local folder as your Dockerfile)
 COPY requirements.txt .
 COPY start.sh .
 
-# Install your python requirements during the BUILD phase
-# Use the correct 'python3' command and path to the venv
-RUN python3 -m venv venv
-RUN /app/venv/bin/pip install --ignore-installed -r requirements.txt
+COPY component.py .
+COPY callbacks.py .
+COPY app_fastapi.py .
+COPY app_dash.py .
+COPY processor.py .
 
-# Expose ports for Ollama (11434) and Code-Server (7777)
+RUN python3 -m venv venv
+RUN pip install --ignore-installed -r requirements.txt
+
 EXPOSE 11434 7777
 
-# Define the command that runs when the container is started
 CMD ["./start.sh"]
