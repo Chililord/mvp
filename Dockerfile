@@ -24,7 +24,7 @@ COPY app_fastapi.py .
 COPY app_dash.py .
 COPY processor.py .
 
-RUN pip install --ignore-installed -r requirements.txt
+RUN pip install --break-system-packages --ignore-installed -r requirements.txt
 
 EXPOSE 11434 7777
 
