@@ -1,5 +1,6 @@
 from dash import Input, Output, State, clientside_callback, html
 from dash.exceptions import PreventUpdate
+import csv
 
 from assets.css.styles import *
 from loguru import logger
@@ -42,7 +43,12 @@ def register_data_callbacks(app_dash):
         
         content_type, content_string = contents.split(',')
         decoded = base64.b64decode(content_string)
+        decoded_io = io.StringIO(decoded.decode('utf-8'))
 
+        reader = csv.reader(decoded_io)
+
+        # Grab the original sequence of columns
+        csv_header_sequence = next(reader)
         try:
             files = {'file': (filename, io.BytesIO(decoded), 'text/csv')} 
 
@@ -53,13 +59,34 @@ def register_data_callbacks(app_dash):
             if response.status_code == 200:
                 enriched_data_list = response.json()
                 num_items = len(enriched_data_list)
-                
+
                 if num_items == 0:
                     return "Processed 0 items.", [], [], True
 
-                all_keys = enriched_data_list[0].keys()
-                dynamic_columns = [{"name": i, "id": i} for i in all_keys if i != 'id']
+                # 1. Get ALL keys returned from the API response (as a set for efficient lookups)
+                all_returned_keys_set = set(enriched_data_list[0].keys())
+                
+                # IMPORTANT TRICKY PART!
+                # NOW, we redefine the 'original_column_order' to only include the keys
+                # that are present in the API response AND maintain the CSV's original sequence.
+                original_column_order = [
+                    col for col in csv_header_sequence 
+                    if col in all_returned_keys_set
+                ]
 
+                # 2. Identify new columns NOT present in the original order list
+                original_set = set(original_column_order) 
+                new_columns = sorted(list(all_returned_keys_set - original_set))
+
+                # 3. Combine the lists: Original order first, new columns appended at the end
+                final_display_order = original_column_order + new_columns
+                
+                # 4. Filter out the 'id' column from the final display list (if present/necessary)
+                columns_to_display = [col for col in final_display_order if col != 'id']
+
+                # 5. Create the dynamic columns list using the guaranteed order
+                dynamic_columns = [{"name": i, "id": i} for i in columns_to_display]
+                
                 return (
                     f"Successfully processed {num_items} items!",
                     enriched_data_list,                          

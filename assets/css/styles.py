@@ -53,6 +53,7 @@ dark_table_style = {
 
 # Define the style for headers
 header_style = {
+    'height': 'auto', 
     'backgroundColor': '#34495e',  # Slightly lighter dark for headers
     'color': 'white',
     'fontWeight': 'bold'

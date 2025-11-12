@@ -37,3 +37,23 @@ type is oversaturated in Q4 market." This immediately increases the value propos
 an enterprise customer."
 
 Not entirely sure what to do about this part
+
+Wow
+
+You need to derive the 
+original column order 
+from the result of the API call, but
+maintain the sequence found in the original csv file...
+
+The data is there, but it's pretty bad
+
+
+Product description lacks price and currency information.
+
+
+Fix bug llm is reading all fields from the pydantic field
+Nevermind its iin the prompt... so it's working super well...
+
+This thing is actually working... Like... it's almost seemingly helpful
+
+It just needs polishing

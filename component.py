@@ -50,20 +50,35 @@ user_interface = html.Div(
                 html.Div(id="upload-status-message", style=response_style)
             ]
         ),style=load_spinner_style),
-
-        # --- Data Table ---
-        dash_table.DataTable(
-            id='enriched-data-table',
-            data=[],      
-            columns=[],    
-            page_size=10,
-            style_table={'overflowX': 'auto'},
-            style_data=dark_table_style,
-            style_header=header_style,
-            style_as_list_view=True,
-            editable=True,
-            row_selectable='multi',
-            selected_rows=[],
-        ),
+        html.Div([
+                # --- Data Table ---
+                dash_table.DataTable(
+                    id='enriched-data-table',
+                    data=[],      
+                    columns=[],    
+                    page_size=20,
+                    style_table={
+                        'overflowX': 'auto',
+                    },
+                    style_cell={
+                        'textAlign': 'left',         # Align text to the left
+                        'whiteSpace': 'nowrap',      # Prevent text wrapping
+                        'overflow': 'hidden',        # Hide overflow
+                        'textOverflow': 'ellipsis',  # Add ellipsis (...) for cut-off text
+                        'minWidth': '150px',         # Set a minimum width for all columns
+                        'width': '150px',            # Set a fixed width
+                        'maxWidth': '150px',         # Set a maximum width
+                    },
+                    style_data=dark_table_style,
+                    style_header=header_style,
+                    style_as_list_view=True,
+                    editable=True,
+                    row_selectable='multi',
+                    selected_rows=[],
+                ),
+            ],
+            # Fix pagination arrows bottom right
+            style={'margin-left': '10px', 'margin-right': '10px'}
+        )
     ]
 )

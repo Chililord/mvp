@@ -24,12 +24,16 @@ class ProductAttributes(BaseModel):
     # Rename 'sku' to 'identifier' or 'original_name' to be explicit
     id: int = Field(description="[INTERNAL] Stable integer ID for database operations.")    
     product_type: str = Field(description="The general category of the product.")
-    # brand: Optional[str] = Field(description="The brand name.")
-    # size_quantity: Optional[str] = Field(alias="size quantity", description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
+    brand: Optional[str] = Field(description="The brand name.")
+    size_quantity: Optional[str] = Field(alias="size quantity", description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
     # price: Optional[float] = Field(description="The numeric value of the product's price, or null if not available.")
     # currency: Optional[str] = Field(description="The three-letter ISO 4217 currency code (e.g., USD, EUR), or null if not available.")
     # availability: Optional[str] = Field(description="The product's availability status (e.g., in stock, out of stock, preorder), or null if not available.")
-
+    # For powerful overview of data quality
+    insight: str = Field(description="Actionable feedback or status regarding data quality.")    
+    anomaly_flag: Optional[str] = Field(description="Notes if this row contains unusual data points or potential errors (e.g., 'Price listed seems unusually low' or 'Unrecognized size format').")
+    quality_score: int = Field(description="An integer score (1-5) indicating the completeness and clarity of the product description data, where 5 is excellent.")
+    
 
 # Received from user. Only product_name is required
 class EnrichRequestItem(BaseModel):
@@ -63,11 +67,13 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
 
     # 2. Embed the schema into your System Prompt
     system_prompt_content = (
-        'You are a ultra-concise data formatting AI. '
-        'Your ONLY task is to generate a VALID and COMPLETE JSON object '
-        'based on the user request and schema provided. Use only the exact keys from the schema. '
-        'No conversational filler or extra words. '
+        'You are a ultra-concise data formatting AI.'
+        'Your ONLY task is to generate a VALID and COMPLETE JSON object'
+        'based on the user request and schema provided. Use only the exact keys from the schema.'
+        'No conversational filler or extra words.'
         'The "price" field must be a raw number (float/integer format only), with no currency symbols, commas, or words like "USD".'
+        'The insight field must be under 15 words and provide only one key observation'
+        'Always use short, direct language'
         'Ensure "currency" field is a 3-letter code.'
         '\n\n### JSON Schema to follow:\n'
         f'{ProductAttributes.model_json_schema()}'
