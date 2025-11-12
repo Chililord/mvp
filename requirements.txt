@@ -6,6 +6,7 @@ dash-uploader
 python-multipart
 requests
 python-dotenv
+sqlalchemy
 fastapi
 uvicorn
 pydantic

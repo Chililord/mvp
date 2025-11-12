@@ -11,10 +11,10 @@ Run ollama:
     OLLAMA_KV_CACHE_TYPE=q8_0 OLLAMA_MAX_VRAM=0 OLLAMA_NUM_PARALLEL=40 OLLAMA_KEEP_ALIVE=-1 OLLAMA_FLASH_ATTENTION=1 ollama serve
 
 Run fastapi + dash runpod:
-    uvicorn app_fastapi:app --host 0.0.0.0 --port 8000 --reload --env-file .env
+    uvicorn main:app --host 0.0.0.0 --port 8000 --reload --env-file .env
 
 Run fastapi local + dash:
-    python -m uvicorn app_fastapi:app --host localhost --port 8000 --reload --env-file .env
+    python -m uvicorn main:app --host localhost --port 8000 --reload --env-file .env
 
 
 '''
@@ -22,7 +22,7 @@ Run fastapi local + dash:
 # Produced for user. Increased tokens used by a lot
 class ProductAttributes(BaseModel):
     # Rename 'sku' to 'identifier' or 'original_name' to be explicit
-    identifier: str = Field(description="The unique identifier from the input (usually the product name or SKU).")
+    id: int = Field(description="[INTERNAL] Stable integer ID for database operations.")    
     product_type: str = Field(description="The general category of the product.")
     # brand: Optional[str] = Field(description="The brand name.")
     # size_quantity: Optional[str] = Field(alias="size quantity", description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
@@ -33,10 +33,11 @@ class ProductAttributes(BaseModel):
 
 # Received from user. Only product_name is required
 class EnrichRequestItem(BaseModel):
+    id: int = Field(description="[INTERNAL] Stable integer ID for database operations.")
     product_name: str = Field(..., description="[REQUIRED] The primary name of the product.")
     product_description: Optional[str] = Field(None, description="[OPTIONAL] Additional descriptive text for improved accuracy.")
-    manufacturer: Optional[str] = Field(None, description="[OPTIONAL] The legal manufacturer of the product.")
-    sku: Optional[str] = Field(None, description="[OPTIONAL] Your internal Stock Keeping Unit (SKU) or MPN.")
+    # manufacturer: Optional[str] = Field(None, description="[OPTIONAL] The legal manufacturer of the product.")
+    # sku: Optional[str] = Field(None, description="[OPTIONAL] Your internal Stock Keeping Unit (SKU) or MPN.")
     # target_market: Optional[str] = Field(None, description="[OPTIONAL] The intended market audience (e.g., B2B, consumer).")
     # user_defined_tags: Optional[str] = Field(None, description="[OPTIONAL] Existing tags or category hints from your system.")
 
@@ -59,7 +60,6 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
     client = ollama.AsyncClient(host='http://localhost:11434')
     prompt = build_prompt_key_value(item)
     content = ""
-    unique_id = item.sku if item.sku is not None and item.sku != '' else item.product_name
 
     # 2. Embed the schema into your System Prompt
     system_prompt_content = (
@@ -101,13 +101,12 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
         validated_product = ProductAttributes.model_validate_json(content)
         validated_product_dict = validated_product.model_dump()
 
-        validated_product_dict['identifier'] = unique_id 
         
         return validated_product_dict
     
     except Exception as e:
         # Log the problematic content if validation fails for debugging Pydantic errors
-        print(f"Ollama API call failed for item '{unique_id}'. Error: {e}")
+        print(f"Ollama API call failed for item '{validated_product_dict['id']}'. Error: {e}")
         print(f"Problematic content was: ---{content}---")
         return None # Or raise the exception if you prefer
 

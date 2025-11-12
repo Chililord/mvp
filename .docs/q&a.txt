@@ -2433,3 +2433,59 @@ What's next?
 One problem with price per row is the tokens in each column of the row, is the best solution
 to just put a limit of token to each column and market it this way so they still get
 the price per row which i think is much better sell than price per token? Thoughts?
+
+Q:
+Is this avenue better for profits than the other approach? What I'm really looking for 
+in the end is to maximize profit generation, and go with whichever has a higher cap / 
+potential. Would this automation approach with a server-per-user be the right direction? 
+Remember to consider that each server could use different gpus, which changes pricing for 
+customers
+A:
+This single-tenant automation approach has a potentially higher profit ceiling than the 
+multi-tenant SaaS model, provided you target the right market segment (Mid-market to 
+Enterprise) and price your service accordingly.
+
+Justifying Premium Pricing: The security, performance, and data isolation you offer are 
+highly valuable to B2B customers who deal with sensitive data. You can easily charge 
+$500+/month per user/team, whereas a multi-tenant competitor might charge $50/month.
+Security, performance, data isolation
+
+GPU Flexibility as a Profit Lever: Your ability to offer different GPUs (e.g., A100s 
+for massive jobs vs. RTX 4090s for standard use) allows for tiered pricing: a Gold tier 
+gets a faster GPU and pays more. You just automate the provisioning of the specific pod 
+type. This increases average revenue per user (ARPU).
+
+Offer different gpus allows for tiered pricing
+
+Higher Cap/Enterprise Potential: Single-tenancy opens doors to larger enterprise contracts
+where security isolation is a non-negotiable requirement. These contracts are far more 
+profitable than managing thousands of small self-service users.
+
+You will need to rely on extremely robust automation for managing many individual pods
+
+Requires automation pipeline up front and sales-driven pricing strategy, but allows
+you to capture significantly more value per customer than a high-volume, low-margin
+multi-tenant approach
+
+Q:
+What do you think about adding checkboxes or something next to each row? 
+That way, a user can select each row they want to send back to the llm, 
+so it's simpler if they want to send back more than 1 row! Then I just have 1 button for 
+submitting the whole batch. Thoughts?
+A:
+This is an excellent idea and a significantly better approach for bulk processing. 
+It improves the user experience by reducing repetitive clicks and streamlines your backend 
+processing by handling a batch instead of individual requests.
+
+This approach is highly recommended and aligns perfectly with your goals of efficiency 
+and automation.
+
+Improved UX for Multiple Rows: Users can quickly select 5, 10, or all rows and process 
+them with a single click.
+
+Backend Efficiency: You send one request to a new FastAPI endpoint (/resynthesize-batch) 
+which can process all items concurrently, reducing network overhead.
+
+Simpler UI Implementation: Dash DataTables have a built-in row_selectable property that 
+makes this feature very easy to implement without external libraries or complex custom 
+JavaScript workarounds.

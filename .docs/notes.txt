@@ -1,2 +1,39 @@
-Add database, and update fastapi download data callback.
-The clientside callback does not need to change therefroe this part is done
+The right pragmatic choice, prioritizing clean code architecture and simplicity over
+optimizing a performance metric that simply doesn't matter for your use case.
+    - scales suitably for your architecture model
+
+I need to think from a more pragmatic perspective. Look for simplest solutions possible only!
+
+
+
+Re-synthesize a specific row using the LLM
+
+The button
+
+Add an action button next to each row in the Dash table that the user clicks
+
+
+So, the new endpoint returns a success message to Callback 1 (handle_batch_resynthesis), 
+and Callback 1 (handle_batch_resynthesis) increments the trigger, 
+which starts Callback 2 (refresh ie pull from db) to refresh the table.
+
+
+
+Oh what the fuck it's magic
+
+The column structure has already been defined by the first callbakc and won't change
+during the session. 
+
+It just updates the data property
+
+oh conflicting , duplicate columns and its trying to decide which one to keep, got it
+
+Actively refining the data using your tool
+
+Upload -> Action -> Download
+
+"Instead of just showing "here is your product type," the tool will soon show "this product 
+type is oversaturated in Q4 market." This immediately increases the value proposition for 
+an enterprise customer."
+
+Not entirely sure what to do about this part
