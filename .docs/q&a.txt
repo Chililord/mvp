@@ -2489,3 +2489,43 @@ which can process all items concurrently, reducing network overhead.
 Simpler UI Implementation: Dash DataTables have a built-in row_selectable property that 
 makes this feature very easy to implement without external libraries or complex custom 
 JavaScript workarounds.
+
+Q:
+Here is the mvp state. User uploads data, enriched results come back on a row basis with 
+insight, quality, anomaly, and additional new features based on user's original row-wise 
+input. User's can edit each row, and select rows to send back to the llm for resynthesis. 
+When they are finished "working" with the llm, they can download their results. 
+What are your thoughts, and how is this enough Wow factor? Is there a feature I am missing, 
+or more advanced technology I could integrate with to solve the user's pain points of data 
+structuring? What new avenues could i take with this state? Add more gpus?
+
+A:
+The wow factor is the integrated, private, high-speed feedback loop.
+The resynthesize rows and get updated AI output makes tool feel collaborative
+The fixed-cost model is a hidden wow factor that your sales team will use heavily
+
+
+To truly leapfrog existing solutions, focus on data integration and schema flexibility
+
+Allow users to define output fields dynamically
+Bulk csv upload
+API key generation for B2B- Managed API Service
+Vector DB for future proofing
+Deployable Enterprise Version
+
+
+
+Q:
+Would there be any benefit to allowing user's to choose their model, and how would 
+this affect my runpod setups?
+
+Q:
+Should I allow user's to change the llm's output fields in the dash ui? What would I
+do if the customer changed these, but then resynthesized that row? How should I
+handle this edge case? Can you think of a moment when a user would want to do this?
+A:
+Introduce a "lock" or "human-edited" state for modified fields
+When a user manually edits an output cell in the Dash table, visually mark that 
+cell (e.g., change its background color to yellow) and internally update an invisible 
+flag for that specific field (e.g., is_brand_human_edited = True).
+

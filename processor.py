@@ -19,21 +19,7 @@ Run fastapi local + dash:
 
 '''
 
-# Produced for user. Increased tokens used by a lot
-class ProductAttributes(BaseModel):
-    # Rename 'sku' to 'identifier' or 'original_name' to be explicit
-    id: int = Field(description="[INTERNAL] Stable integer ID for database operations.")    
-    product_type: str = Field(description="The general category of the product.")
-    brand: Optional[str] = Field(description="The brand name.")
-    size_quantity: Optional[str] = Field(alias="size quantity", description="A single, concise string for size/quantity. Format: '100g', '12 pack', 'Small', '1 box', etc. DO NOT use sentences or extra explanations. Keep it under 5 words.")
-    # price: Optional[float] = Field(description="The numeric value of the product's price, or null if not available.")
-    # currency: Optional[str] = Field(description="The three-letter ISO 4217 currency code (e.g., USD, EUR), or null if not available.")
-    # availability: Optional[str] = Field(description="The product's availability status (e.g., in stock, out of stock, preorder), or null if not available.")
-    # For powerful overview of data quality
-    insight: str = Field(description="Actionable feedback or status regarding data quality.")    
-    anomaly_flag: Optional[str] = Field(description="Notes if this row contains unusual data points or potential errors (e.g., 'Price listed seems unusually low' or 'Unrecognized size format').")
-    quality_score: int = Field(description="An integer score (1-5) indicating the completeness and clarity of the product description data, where 5 is excellent.")
-    
+
 
 # Received from user. Only product_name is required
 class EnrichRequestItem(BaseModel):
@@ -49,7 +35,7 @@ class EnrichRequestItem(BaseModel):
 
 def build_prompt_key_value(item: EnrichRequestItem):
     prompt_text = "Analyze the following product data:\n"
-    
+
     # Use item.dict(exclude_none=True) to dynamically include only provided fields
     for key, value in item.model_dump(exclude_none=True).items():
         if str(value).strip(): 
@@ -59,7 +45,7 @@ def build_prompt_key_value(item: EnrichRequestItem):
     return prompt_text
 
 
-async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]]:
+async def call_llm_api_async(item: EnrichRequestItem, output_schema) -> Optional[Dict[str, Any]]:
     # ... (imports needed: from pydantic import BaseModel, Field, etc.)
     client = ollama.AsyncClient(host='http://localhost:11434')
     prompt = build_prompt_key_value(item)
@@ -76,7 +62,7 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
         'Always use short, direct language'
         'Ensure "currency" field is a 3-letter code.'
         '\n\n### JSON Schema to follow:\n'
-        f'{ProductAttributes.model_json_schema()}'
+        f'{output_schema.model_json_schema()}'
     )
 
     try:
@@ -97,14 +83,14 @@ async def call_llm_api_async(item: EnrichRequestItem) -> Optional[Dict[str, Any]
                 'num_ctx': 1000,
                 'num_predict': 300
             },
-            format=ProductAttributes.model_json_schema(), 
+            format=output_schema.model_json_schema(), 
         )
-        
+  
         # FIX 4: Access content safely (adjust if SDK structure is different)
         content = response['message']['content'].strip() 
 
         # Validate the LLM output using Pydantic
-        validated_product = ProductAttributes.model_validate_json(content)
+        validated_product = output_schema.model_validate_json(content)
         validated_product_dict = validated_product.model_dump()
 
         
@@ -122,7 +108,7 @@ def chunk_list(data_list, batch_size):
     for i in range(0, len(data_list), batch_size):
         yield data_list[i:i + batch_size]
 
-async def process_data_api_concurrently_async(all_items: List[EnrichRequestItem]):
+async def process_data_api_concurrently_async(all_items: List[EnrichRequestItem], output_schema):
     
     # Use a BATCH_SIZE that you know won't crash (e.g., 20 items for A5000)
     # THIS WILL CHANGE DEPENDING ON PYDANTIC SCHEMA OUTPUT LENGTH
@@ -131,7 +117,7 @@ async def process_data_api_concurrently_async(all_items: List[EnrichRequestItem]
     
     for batch in chunk_list(all_items, BATCH_SIZE):
         # Process this small batch
-        tasks = [call_llm_api_async(item) for item in batch]
+        tasks = [call_llm_api_async(item, output_schema) for item in batch]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         
         all_results.extend(results)

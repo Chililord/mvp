@@ -48,7 +48,8 @@ load_spinner_style = {
 # Define a dark style dictionary
 dark_table_style = {
     'backgroundColor': '#2c3e50',  # Dark background color (from DARKLY theme palette)
-    'color': '#ecf0f1'             # Light text color (from DARKLY theme palette)
+    'color': '#ecf0f1',          # Light text color (from DARKLY theme palette)
+    'border-right': '1px solid #ecf0f1' # <-- INCREASED TO 3px
 }
 
 # Define the style for headers
@@ -56,5 +57,13 @@ header_style = {
     'height': 'auto', 
     'backgroundColor': '#34495e',  # Slightly lighter dark for headers
     'color': 'white',
-    'fontWeight': 'bold'
+    'fontWeight': 'bold',
+    'border-right':'1px solid #ecf0f1' # <-- INCREASED TO 3px
+
+}
+
+warning_text_style = {
+    'color': '#f39c12',  # Muted orange/gold color (fits dark themes well)
+    'margin-top': '5px',
+    'font-style': 'italic', # Optional: makes it look less like an error, more like a note
 }

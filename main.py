@@ -1,6 +1,8 @@
 # Middleware
-from fastapi import FastAPI, HTTPException, File, UploadFile, Body
+from fastapi import FastAPI, HTTPException, File, UploadFile, Body, Form
 from fastapi.responses import Response
+from pydantic import BaseModel, Field, create_model
+from typing import List, Dict, Union, Optional
 
 
 # Backend
@@ -51,9 +53,10 @@ def create_app_dash():
     configure_dev_tools(app_dash, os.getenv("ENVIRONMENT", "DEV"))
 
 
-    register_data_callbacks(app_dash)
-
     app_dash.layout = user_interface
+
+
+    register_data_callbacks(app_dash)
 
     logger.info("app_dash is configured")
     return app_dash
@@ -97,10 +100,50 @@ app.mount("/dash/", WSGIMiddleware(dash_app_instance.server))
 db_engine = create_engine(os.getenv("DATABASE_URL", "sqlite:///./.database.db"))
 
 
+# Produced for user. Increased tokens used by a lot
+class DefaultProductAttributes(BaseModel):
+    # Rename 'sku' to 'identifier' or 'original_name' to be explicit
+    id: int = Field(description="[INTERNAL] Stable integer ID for database operations.")    
+    insight: str = Field(description="Actionable feedback or status regarding data quality.")    
+    anomaly_flag: Optional[str] = Field(description="Notes if this row contains unusual data points or potential errors (e.g., 'Price listed seems unusually low' or 'Unrecognized size format').")
+    quality_score: int = Field(description="An integer score (1-5) indicating the completeness and clarity of the product description data, where 5 is excellent.")
+
+
+# Payload fields from user's custom field entries
+class CustomField(BaseModel):
+    name: str
+    description: str
+
+# Model for the overall configuration sent from Dash
+class SchemaPayload(BaseModel):
+    mode: str # 'defaults' or 'custom'
+    fields: List[CustomField]
+
+
 @app.post("/enrich-products", summary="Enrich a list of product items")
-async def upload_and_enrich_csv_endpoint(file: UploadFile = File(...)):
+async def upload_and_enrich_csv_endpoint(file: UploadFile = File(...), schema_config_str: str = Form(...)):
 
     logger.info("Receiving post from Dash inside fastapi")
+
+    try:
+        schema_data = SchemaPayload.model_validate_json(schema_config_str)
+    except Exception as e:
+        raise HTTPException(status_code=422, detail=f"Invalid JSON format for schema_config: {str(e)}")
+    
+    # --- LOGIC TO DETERMINE THE PYDANTIC MODEL DYNAMICALLY ---
+    if schema_data.mode == 'defaults':
+        output_schema = DefaultProductAttributes # Use your hardcoded default
+    elif schema_data.mode == 'custom':
+        fields_dict = {
+            'id': (int, Field(description="[INTERNAL] Stable integer ID for database ops.")),
+        }
+        for field in schema_data.fields:
+            # Dynamically add the user's field name and description
+            fields_dict[field.name] = (Optional[str], Field(description=field.description))
+
+        output_schema = create_model('DynamicProductAttributes', **fields_dict)
+    else:
+        raise HTTPException(status_code=400, detail="Invalid schema mode provided.")
 
     content = await file.read()
     try:
@@ -111,6 +154,7 @@ async def upload_and_enrich_csv_endpoint(file: UploadFile = File(...)):
     if df_original.empty:
         raise HTTPException(status_code=400, detail="CSV file is empty.")
     
+
     expected_fields = set(EnrichRequestItem.model_fields.keys())
     csv_columns = set(df_original.columns)
     valid_columns_to_keep = list(expected_fields.intersection(csv_columns))
@@ -127,7 +171,10 @@ async def upload_and_enrich_csv_endpoint(file: UploadFile = File(...)):
     except Exception as e:
          raise HTTPException(status_code=422, detail=f"Data validation error in CSV rows: {str(e)}")
 
-    enriched_results = await process_data_api_concurrently_async(items_for_processing)
+    enriched_results = await process_data_api_concurrently_async(items_for_processing, output_schema)
+
+
+
 
     df_enriched = pd.DataFrame(enriched_results)
 
@@ -252,6 +299,7 @@ async def resynthesize_batch_rows(rows_data: list[dict] = Body(...)):
             # And rename the new ones back to their original DB name (product_type)
             df_updated_rows = df_updated_rows.rename(columns={col: col[:-4]}) # Remove the '_new' suffix
 
+    # 4. Merge back the original data with the newly synthesized insights using the stable 'id'
     df_updated_rows = df_updated_rows.replace({np.nan: None})
 
     # 5. Update the Database
